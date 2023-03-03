@@ -34,18 +34,38 @@ void read_file(string file_name) {
 
 int main(int argc, char** argv) {
 
-    /*Read File*/
+    unordered_map<string, list<int> > un_map;
 
-    string file_name = "../example/chry.txt";
+    string file_name = "o texto o texto e o texto";
     //read_file(file_name);
 
-    unordered_map<string, int> un_map;
+    int k = 5;
 
-    un_map.insert(make_pair("o tex", 1));
-    un_map.insert(make_pair(" text", 2));   
+    for (int i = 0; i < file_name.length() - k; i++) {
+        string k_gram = file_name.substr(i, k);
 
-    for(auto& p: un_map)
-        std::cout << " " << p.first << " => " << p.second << '\n';
+        list<int> pos;
+        if (un_map.find(k_gram) == un_map.end()){
+            pos.push_back(i);
+            un_map.insert(make_pair(k_gram, pos));
+        } else {
+            list<int> pos = un_map[k_gram];
+            pos.push_back(i);
+            un_map.insert(make_pair(k_gram, pos));
+        }
+
+
+        un_map.insert(make_pair(k_gram, i));
+    }
+
+    for (auto it = un_map.begin(); it != un_map.end(); it++) {
+        cout << it->first << " => ";
+        for (int i : it->second) {
+            cout << i << " ";
+        }
+        cout << endl;
+    }
+
 
 
     return 0;
