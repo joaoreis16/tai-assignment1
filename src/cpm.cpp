@@ -1,6 +1,12 @@
 #include <iostream>
 #include "hashTable.cpp"
 
+#include <fstream>
+#include <unordered_map>
+#include <string>
+
+
+
 using namespace std;
 
 //////// compile and run /////////
@@ -10,16 +16,37 @@ using namespace std;
 //                              //
 //////////////////////////////////
 
+
+void read_file(string file_name) {
+    ifstream file;
+    file.open(file_name);
+    if (file.is_open()) {
+        string line;
+        while (getline(file, line)) {
+            cout << line << endl;
+        }
+        file.close();
+    } else {
+        cout << "Unable to open file";
+    }
+}
+
+
 int main(int argc, char** argv) {
 
-    HashTable* table = new HashTable(10);
+    /*Read File*/
 
-    table->insertElement(45);
-    table->insertElement(23);
-    table->insertElement(67);
+    string file_name = "../example/chry.txt";
+    //read_file(file_name);
 
-    table->printAll();
-        
-    cout << "fim" << endl;
+    unordered_map<string, int> un_map;
+
+    un_map.insert(make_pair("o tex", 1));
+    un_map.insert(make_pair(" text", 2));   
+
+    for(auto& p: un_map)
+        std::cout << " " << p.first << " => " << p.second << '\n';
+
+
     return 0;
 }
