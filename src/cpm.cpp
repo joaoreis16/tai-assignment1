@@ -1,5 +1,6 @@
 #include <iostream>
 #include "hashTable.cpp"
+
 using namespace std;
 
 //////// compile and run /////////
@@ -10,12 +11,15 @@ using namespace std;
 //////////////////////////////////
 
 int main(int argc, char** argv) {
-    printf("You have entered %s arguments\n", argc);
-  
-    for (int i = 0; i < argc; ++i) {
-        printf("%s\n", argv[i]);
-    }
+
+    HashTable* table = new HashTable(10);
+
+    table->insertElement(45);
+    table->insertElement(23);
+    table->insertElement(67);
+
+    table->printAll();
         
-  
+    cout << "fim" << endl;
     return 0;
 }
