@@ -1,4 +1,5 @@
 #include <iostream>
+#include "hashTable.cpp"
 using namespace std;
 
 //////// compile and run /////////
