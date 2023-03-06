@@ -1,23 +1,90 @@
 #include <iostream>
-
 #include <fstream>
 #include <unordered_map>
 #include <string>
 #include <list>
 #include <iterator>
 
-
-
-
 using namespace std;
 
-//////// compile and run /////////
-//                              //
-//  g++ -o bin/cpm src/cpm.cpp  //
-//  ./bin/cpm                   //
-//                              //
-//////////////////////////////////
+///////////////////////////////////////////////////////§
 
+bool contains(list<string> list, string element);
+
+void read_file(string file_name);
+
+char read_char(string file_name);
+
+void print_words_read_list(list<string> words_read);
+
+void print_unordered_map();
+
+///////////////////////////////////////////////////////
+
+// Global Variables
+static unordered_map<string, list<int> > un_map;
+
+static list<string> k_word_read_vector;
+
+///////////////////////////////////////////////////////§
+
+int main(int argc, char** argv) {
+
+    string string_example = "o texto o texto e o texto";
+
+    int k = 5;
+
+    for (int i = 0; i < string_example.length() - k; i++) {
+        string k_string = string_example.substr(i, k);
+
+        if (contains(k_word_read_vector, k_string)) {
+            string word = un_map.find(k_string)->first; // dá a key do mapa
+            list<int> index = un_map.find(k_string)->second; // ir buscar os values do map (lista de indices)
+
+            int next_index = index.back() + 1;
+            
+            int index2 = 0;
+            for (auto it = k_word_read_vector.begin(); it != k_word_read_vector.end(); ++it) {
+                if (index2 == next_index) {
+                    cout << "the word is: " << k_string << " the next is: " <<*it << endl;
+                }
+                index2++;
+            }
+        }
+        un_map[k_string].push_back(i);
+        k_word_read_vector.push_back(k_string);
+    }
+
+    //print this just for debugging
+    //print_words_read_list(k_word_read_vector);
+    //print_unordered_map();
+
+    return 0;
+}
+
+void print_words_read_list(list<string> words_read_list) {
+    cout << "words_read" << endl;
+    int index = 0;
+    for (auto it = words_read_list.begin(); it != words_read_list.end(); ++it) {
+        cout << index << " -> " << *it << '\n';
+        index++;
+    }
+}
+
+void print_unordered_map() {
+    cout << "unorderer_map" << endl;
+    for (auto it = un_map.begin(); it != un_map.end(); it++) {
+        cout << it->first << " => ";
+        for (int i : it->second) {
+            cout << i << " ";
+        }
+        cout << endl;
+    }
+}
+
+bool contains(list<string> list, string element) {
+    return find(list.begin(), list.end(), element) != list.end();
+}
 
 void read_file(string file_name) {
     ifstream file;
@@ -31,11 +98,6 @@ void read_file(string file_name) {
     } else {
         cout << "Unable to open file";
     }
-}
-
-bool contains(list<string> list, string element) {
-    return find(list.begin(), list.end(), element) != list.end();
-
 }
 
 // Function to read and return a char from the file every time it is called
@@ -52,87 +114,4 @@ char read_char(string file_name) {
     }
 
     return c;
-}
-
-int main(int argc, char** argv) {
-
-    unordered_map<string, list<int> > un_map;
-
-    string string_example = "o texto o texto e o texto";
-    list<string> k_word_read_vector;
-    // read_file(file_name);
-    //ask for the file name
-    string file_name;
-    // cout << "Please enter the file name: ";
-    // cin >> file_name;
-
-    //print first 5 chars
-    // cout << "First 5 chars: ";
-    // for (int i = 0; i < 5; i++) {
-    //     cout << read_char(file_name);
-    // }
-
-
-    int k = 5;
-
-    // populate the map with substrings of size k, save the index of the k_word in the list
-    for (int i = 0; i < string_example.length() - k; i++) {
-        string k_string = string_example.substr(i, k);
-
-
-        if (contains(k_word_read_vector, k_string)) {
-            cout << "a palavra já apareceu, siga ver qual será a proxima letra" << " --  " << i << "  --  " << endl;
-
-            // ent agora temos de ir ao nosso hash e ir procurar pela palavra que ja apareceu para sabermos o indice que foi pra depois
-            // ir buscar o indice da proxima palavra pra saber qual é a mais provavel de aparecer, mas é pra ir buscar à lista (neste caso k_word_read_vector)
-
-            string word = un_map.find(k_string)->first; // dá a key do mapa
-            list<int> index = un_map.find(k_string)->second; // ir buscar os values do map (lista de indices)
-            cout << "a palavra é: " << word << " e o indice é " << index.back() << endl; // index.back() dá o ultimo index da lista de indices
-
-
-            //ir a lista k_word_read_vector e ver qual é a proxima palavra mais provavel de aparecer (index + 1)
-            int next_index = index.back() + 1;
-            
-            //auto it = k_word_read_vector.begin();
-            //cout << "aquiiiiii " << next_index << endl;
-            //advance(it, next_index);
-
-            int index2 = 0;
-            for (auto it = k_word_read_vector.begin(); it != k_word_read_vector.end(); ++it) {
-                if (index2 == next_index) {
-                    cout << "a proxima palavra mais provavel é: " << *it << endl;
-                }
-                index2++;
-            }
-        }
-
-        un_map[k_string].push_back(i);
-        k_word_read_vector.push_back(k_string);
-    }
-
-    cout << "\n\n" << endl;
-
-    int index = 0;
-    for (auto it = k_word_read_vector.begin(); it != k_word_read_vector.end(); ++it) {
-        cout << index << " -> " << *it << '\n';
-        index++;
-    }
-    
-
-    
-    cout << "\n\n" << endl;
-
-    // print the map
-    for (auto it = un_map.begin(); it != un_map.end(); it++) {
-        cout << it->first << " => ";
-        for (int i : it->second) {
-            cout << i << " ";
-        }
-        cout << endl;
-    }
-
-
-
-    return 0;
 }
