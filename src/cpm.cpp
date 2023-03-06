@@ -13,7 +13,7 @@ bool contains(list<string> list, string element);
 
 void read_file(string file_name);
 
-char read_char(string file_name);
+string read_char(string file_name, int k);
 
 void print_words_read_list(list<string> words_read);
 
@@ -29,6 +29,7 @@ static list<string> k_word_read_vector;
 ///////////////////////////////////////////////////////§
 
 int main(int argc, char** argv) {
+
 
     string string_example = "o texto o texto e o texto";
 
@@ -82,8 +83,8 @@ void print_unordered_map() {
     }
 }
 
-bool contains(list<string> list, string element) {
-    return find(list.begin(), list.end(), element) != list.end();
+ bool contains(list<string> list, string element) {
+     return find(list.begin(), list.end(), element) != list.end();
 }
 
 void read_file(string file_name) {
@@ -100,14 +101,25 @@ void read_file(string file_name) {
     }
 }
 
-// Function to read and return a char from the file every time it is called
-char read_char(string file_name) {
+// Function to read and return "k" chars from the file every time it is called
+string read_char(string file_name, int k) {
+
     static ifstream file;
-    static char c;
+    static string c;
     if (!file.is_open()) {
         file.open(file_name);
     }
-    file.get(c);
+
+    // read k chars from the file
+    char buffer[k];
+    file.read(buffer, k);
+    c= string(buffer, k);
+
+    // check if the file has less than k chars
+    if (file.gcount() < k) {
+        c = c.substr(0, file.gcount());
+    }
+
     //if it is the end of the file, close the file
     if (file.eof()) {
         file.close();
