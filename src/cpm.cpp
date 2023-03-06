@@ -38,6 +38,21 @@ bool contains(list<string> list, string element) {
 
 }
 
+// Function to read and return a char from the file every time it is called
+char read_char(string file_name) {
+    static ifstream file;
+    static char c;
+    if (!file.is_open()) {
+        file.open(file_name);
+    }
+    file.get(c);
+    //if it is the end of the file, close the file
+    if (file.eof()) {
+        file.close();
+    }
+
+    return c;
+}
 
 int main(int argc, char** argv) {
 
@@ -46,6 +61,17 @@ int main(int argc, char** argv) {
     string string_example = "o texto o texto e o texto";
     list<string> k_word_read_vector;
     // read_file(file_name);
+    //ask for the file name
+    string file_name;
+    // cout << "Please enter the file name: ";
+    // cin >> file_name;
+
+    //print first 5 chars
+    // cout << "First 5 chars: ";
+    // for (int i = 0; i < 5; i++) {
+    //     cout << read_char(file_name);
+    // }
+
 
     int k = 5;
 
