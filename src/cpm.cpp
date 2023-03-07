@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
     string word;
     // string string_example = "o texto o texto e o texto";
 
+
     do {
         word = read_char(argv[1], k);
         cout << "content => " << word << endl;
@@ -131,18 +132,24 @@ string read_char(string file_name, int k) {
     static string c;
     if (!file.is_open()) {
         file.open(file_name);
+        char buffer[k];
+        file.read(buffer, k);
+        c = string(buffer, k);
+
     }
+    //else read 1 char and append it to the string
+    else {
+        // bring the pointer k-1 positions back
+        file.seekg(-k+1, ios::cur);
+        char buffer[k];
+        file.read(buffer, k);
+        c = string(buffer, k);
 
-    // read k chars from the file
-    char buffer[k];
-    file.read(buffer, k);
-    c = string(buffer, k);
-
+    }
     // check if the file has less than k chars
     if (file.gcount() < k) {
         c = c.substr(0, file.gcount());
     }
-
     //if it is the end of the file, close the file
     if (file.eof()) {
         file.close();
