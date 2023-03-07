@@ -137,7 +137,7 @@ string read_char(string file_name, int k) {
         c = string(buffer, k);
 
     }
-    //else read 1 char and append it to the string
+    //else bring the pointer k-1 positions back and read k chars
     else {
         // bring the pointer k-1 positions back
         file.seekg(-k+1, ios::cur);
