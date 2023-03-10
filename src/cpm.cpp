@@ -16,6 +16,8 @@ void read_file(string file_name);
 
 string read_char(string file_name, int k);
 
+void bring_back(string file_name, int k);
+
 void print_words_read_list(list<string> words_read);
 
 void print_unordered_map();
@@ -25,34 +27,27 @@ void print_unordered_map();
 static unordered_map<string, list<int> > un_map;
 static list<string> k_word_read_vector;
 static int alpha = 1;
+static int K = 5;
+
+static int N_hits  = 0;
+static int N_fails = 0;
 
 ///////////////////////////////////////////////////////
 
-float calculate_probability(string word, string next_word) {
-    int count, next_count = 0;;
-
-    for (auto it = un_map.begin(); it != un_map.end(); it++) {
-        if (it->first == word)      count++;
-        if (it->first == next_word) next_count++;
-    }
-
-    return (float) (next_count + alpha)/(count + 2 * alpha);
+float calculate_probability(string word, char next_char) {
+    return (float) (N_hits + alpha)/(N_hits + N_fails + 2 * alpha);
 }
 
 int main(int argc, char** argv) {
 
-    if (argc < 2) {
-        printf("[usage]: %s file_path", argv[0]);
-    }
+    if (argc < 2) printf("[usage]: %s file_path", argv[0]);
     
     int i = 0;
-    int k = 5;
     string word;
-    // string string_example = "o texto o texto e o texto";
-
+    char predicted_next_char;
 
     do {
-        word = read_char(argv[1], k);
+        word = read_char(argv[1], K);
         cout << "content => " << word << endl;
 
         if (word == "") break;
@@ -67,8 +62,21 @@ int main(int argc, char** argv) {
             int index2 = 0;
             for (auto it = k_word_read_vector.begin(); it != k_word_read_vector.end(); ++it) {
                 if (index2 == next_index) {
-                    cout << "the word is: '" << word << "' the next is: '" << *it << "'" << endl;
-                    prob_hit = calculate_probability(word, *it);
+
+                    char actual_char = word.back();
+
+                    if (predicted_next_char != NULL) {
+                        if (predicted_next_char == actual_char) N_hits++;
+                        else N_fails++;
+                    }
+
+                    string next_word = *it;
+                    predicted_next_char = next_word.back();
+
+                    cout << "the word is: '" << word << "' the next is: '" << next_word << "'" << endl;
+                    cout << "I predict : " << predicted_next_char << endl;
+
+                    prob_hit = calculate_probability(word, predicted_next_char);
                 }
                 index2++;
             }
@@ -81,9 +89,9 @@ int main(int argc, char** argv) {
 
     } while (true);
 
-    //print this just for debugging
-    print_words_read_list(k_word_read_vector);
-    print_unordered_map();
+    // print this just for debugging
+    // print_words_read_list(k_word_read_vector);
+    // print_unordered_map();
 
     return 0;
 }
@@ -110,19 +118,6 @@ void print_unordered_map() {
 
 bool contains(list<string> list, string element) {
     return find(list.begin(), list.end(), element) != list.end();
-}
-
-string read_file(char *file_name) {
-    ifstream file;
-    file.open(file_name);
-
-    string str;
-    string content;
-    while (getline(file, str)) {
-        content += str;
-    } 
-
-    return content;
 }
 
 // Function to read and return "k" chars from the file every time it is called
@@ -157,4 +152,13 @@ string read_char(string file_name, int k) {
     }
 
     return c;
+}
+
+// Function to bring the pointer k positions back
+void bring_back(string file_name, int k) {
+    static ifstream file;
+    if (!file.is_open()) {
+        file.open(file_name);
+    }
+    file.seekg(-k, ios::cur);
 }
