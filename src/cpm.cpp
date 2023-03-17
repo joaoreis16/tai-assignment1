@@ -5,6 +5,7 @@
 #include <list>
 #include <iterator>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -27,15 +28,20 @@ void print_unordered_map();
 static unordered_map<string, list<int> > un_map;
 static list<string> k_word_read_vector;
 static int alpha = 1;
-static int K = 5;
+static int K = 9;
 
 static int N_hits  = 0;
 static int N_fails = 0;
+static float threshold = 0.30;
 
 ///////////////////////////////////////////////////////
 
 float calculate_probability(string word, char next_char) {
     return (float) (N_hits + alpha)/(N_hits + N_fails + 2 * alpha);
+}
+
+float calculate_bits(float prob) {
+    return (float) -log2(prob);
 }
 
 int main(int argc, char** argv) {
@@ -45,12 +51,14 @@ int main(int argc, char** argv) {
     int i = 0;
     string word;
     char predicted_next_char;
+    float bits;
 
     do {
         word = read_char(argv[1], K);
+        if (word == "") break;
         cout << "content => " << word << endl;
 
-        if (word == "") break;
+        if (N_hits != 0 && N_fails != 0 && N_hits / N_fails < threshold) break;
 
         if (contains(k_word_read_vector, word)) {
             string k_string = un_map.find(word)->first;         // dá a key do mapa
@@ -65,7 +73,7 @@ int main(int argc, char** argv) {
 
                     char actual_char = word.back();
 
-                    if (predicted_next_char != NULL) {
+                    if (predicted_next_char) {
                         if (predicted_next_char == actual_char) N_hits++;
                         else N_fails++;
                     }
@@ -75,12 +83,15 @@ int main(int argc, char** argv) {
 
                     cout << "the word is: '" << word << "' the next is: '" << next_word << "'" << endl;
                     cout << "I predict : " << predicted_next_char << endl;
+                    cout << "N_Fails: " << N_fails << " | N_Hits: " << N_hits << endl;
 
                     prob_hit = calculate_probability(word, predicted_next_char);
+                    bits = calculate_bits(prob_hit);
                 }
                 index2++;
             }
             cout << "P(hit) = " << prob_hit << "\n" << endl;
+            cout << "num bits = " << bits << endl;
         }
 
         un_map[word].push_back(i);
