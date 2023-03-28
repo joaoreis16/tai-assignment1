@@ -40,10 +40,11 @@ int main(int argc, char **argv)
     read_file();
     calculate_probabilities();
     print_unordered_map();
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 20; i++)
     {
         predict();
     }
+    print_unordered_map();
 
     return 0;
 }
@@ -161,29 +162,29 @@ void predict()
     if (letter == 0)
     {
         cout << "t" << endl;
+        //update the probabilities in the map
+        un_map[word] = make_tuple(get<0>(probabilities) + 1, get<1>(probabilities), get<2>(probabilities), get<3>(probabilities));
     }
     else if (letter == 1)
     {
         cout << "e" << endl;
+        //update the probabilities in the map
+        un_map[word] = make_tuple(get<0>(probabilities), get<1>(probabilities) + 1, get<2>(probabilities), get<3>(probabilities));
     }
     else if (letter == 2)
     {
         cout << "x" << endl;
+        //update the probabilities in the map
+        un_map[word] = make_tuple(get<0>(probabilities), get<1>(probabilities), get<2>(probabilities) + 1, get<3>(probabilities));
     }
     else if (letter == 3)
     {
         cout << "o" << endl;
+        //update the probabilities in the map
+        un_map[word] = make_tuple(get<0>(probabilities), get<1>(probabilities), get<2>(probabilities), get<3>(probabilities) + 1);
     }
 
-    //add the new letter to the vector
-    word += letter;
-    word.erase(0, 1);
-    k_word_read_vector.push_back(word);
+
     
-    if (un_map.find(word) == un_map.end())
-    {
-        un_map[word] = make_tuple(0, 0, 0, 0);
-    }
-
-
+    
 }
