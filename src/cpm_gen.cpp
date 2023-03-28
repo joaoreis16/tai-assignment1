@@ -24,7 +24,7 @@ void predict();
 
 /////////////// global variables //////////////////////
 
-static unordered_map<string, tuple<int, int, int, int>> un_map; // this map will store a k-char sequence as a key and a tuple of probabilities for each symbol as a value
+static unordered_map<string, tuple<int, int, int, int> > un_map; // this map will store a k-char sequence as a key and a tuple of probabilities for each symbol as a value
 static string file_name;
 static ifstream file;
 

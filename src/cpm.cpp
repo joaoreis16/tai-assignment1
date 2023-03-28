@@ -28,7 +28,7 @@ void predict(char **argv);
 
 /////////////// global variables //////////////////////
 
-static unordered_map<string, list<int>> un_map;
+static unordered_map<string, list<int> > un_map;
 static string file_name;
 static ifstream file;
 
