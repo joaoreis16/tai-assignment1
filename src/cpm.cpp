@@ -53,6 +53,9 @@ int lowest_index = 0;
 int actual_index = 0;
 bool end_of_file = false;
 
+int total_number_of_symbols = 0;
+int average_bits_per_symbol = 0;
+
 
 ///////////////////////////////////////////////////////
 
@@ -104,15 +107,19 @@ int main(int argc, char **argv)
     {
         if (word == "")
             break;
-        //cout << "content => " << word << endl;
         //cout << "actual_index => " << actual_index << endl;
+        if (actual_index % 10000 == 0)
+        {
+            cout << "actual_index => " << actual_index << endl;
+        }
 
-        if (std::find(k_word_read_vector.begin(), k_word_read_vector.end(), word) != k_word_read_vector.end())
+        if (un_map.count(word) >0)
         {
             predict(argv);
         }
         else
         {
+
             //  the map mantains only (map_size) references to the words, so if we have more than that words, we remove the oldest one
             if (un_map[word].size() > map_size)
             {
@@ -135,6 +142,8 @@ int main(int argc, char **argv)
     // }
     // print_unordered_map();
     cout << "bits int => " << int(bits) << endl;
+    cout << "total_number_of_symbols => " << total_number_of_symbols << endl;
+    cout << "average_bits_per_symbol => " << (int)(bits / total_number_of_symbols) << endl;
 
     auto end = chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
@@ -144,7 +153,9 @@ int main(int argc, char **argv)
 }
 
 void predict(char **argv)
+
 {
+
     string k_string = un_map.find(word)->first;  // dá a key do mapa
     list<int> index = un_map.find(word)->second; // ir buscar os values do map (lista de indices)
 
@@ -344,6 +355,8 @@ string read_char(int k)
         char buffer[k];
         file.read(buffer, k);
         c = string(buffer, k);
+        bits += log2(4) * k;
+
     }
     // else bring the pointer k-1 positions back and read k chars
     else
@@ -362,6 +375,7 @@ string read_char(int k)
     // if it is the end of the file, close the file
     if (file.eof())
     {
+        end_of_file = true;
         file.close();
         return "";
     }
