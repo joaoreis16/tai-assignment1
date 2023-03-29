@@ -35,6 +35,8 @@ static int N_different_symbols = 0;
 static vector<string> k_word_read_vector;
 static int K = 3;
 static int N = 500;
+std::random_device rd;
+std::mt19937 gen(rd());
 
 
 ///////////////////////////////////////////////////////
@@ -173,18 +175,18 @@ void predict()
     }
     
     //pick a letter random using the probabilities calculated
-    std::random_device rd;
-    std::mt19937 gen(rd());
+
     std::discrete_distribution<> d(probabilities.begin(), probabilities.end());
-    
 
     int letter = d(gen);
     
     char next_char = different_symbols[letter];
     
-    //add the new letter to the vector
+    // update the probabilities of the last K characters
+    un_map[word][letter]++;
     
     
+    //add the new letter to the vector 
     word.erase(0, 1);
     word += next_char;
     //cout << "new word: " << word << endl;
@@ -196,9 +198,12 @@ void predict()
     {
         un_map[word] = vector<float>(N_different_symbols, 0);
     }
-    
+
     
 
+
+
+    
     
 }
 
