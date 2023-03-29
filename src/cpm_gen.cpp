@@ -124,11 +124,9 @@ void calculate_probabilities()
             break;
         }
 
-
         char next_char = k_word_read_vector[i + 1][K - 1];
         cout << next_char << endl;
         int index = find(different_symbols.begin(), different_symbols.end(), next_char) - different_symbols.begin();
-        cout << "index: " << index << endl;
         un_map[word][index]++;
 
         
@@ -198,12 +196,7 @@ void predict()
     {
         un_map[word] = vector<float>(N_different_symbols, 0);
     }
-
-    
-
-
-
-    
+ 
     
 }
 
