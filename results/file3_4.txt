@@ -1,0 +1,3 @@
+alpha-0.25
+threshold-4
+K-3
