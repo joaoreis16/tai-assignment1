@@ -12,11 +12,11 @@ else
     for K in {3..8}; do
         for A in "${alpha[@]}"; do
             for T in {1..6}; do
-                f=$(printf "%s../results/%d_%d.txt" "" $K $T)
+                f=$(printf "%s../results/file%d_%d.txt" "" $K $T)
                 if [ ! -e $f ]; then
                     echo $f
                     echo Executing CPM for K=$K alpha=$A threshold=$T
-                    ./CPM -f ../example/chry.txt -k $K -a $A -t $T > ../results/${K}_${T}.txt
+                    ./CPM -f ../example/chry.txt -k $K -a $A -t $T > ../results/file${K}_${T}.txt
                 fi
             done
         done

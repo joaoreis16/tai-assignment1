@@ -29,9 +29,14 @@ void print_unordered_map();
 
 void predict(char **argv);
 
+void print_char_average_bits();
+
 /////////////// global variables //////////////////////
 
 static unordered_map<string, list<int> > un_map;
+static unordered_map<char, float> char_bits;
+static unordered_map<char, int> char_occurrences;
+
 static string file_name;
 static ifstream file;
 
@@ -39,6 +44,8 @@ static vector<string> k_word_read_vector;
 static float alpha = 1;
 static int K = 4;
 static string word;
+static int total_characters = 0;
+
 
 static int N_hits = 0;
 static int N_fails = 0;
@@ -98,7 +105,9 @@ int main(int argc, char **argv)
         }
     }
 
-    cout << "alpha " << alpha << endl;
+    cout << "alpha-" << alpha << endl;
+    cout << "threshold-" << threshold << endl;
+    cout << "K-" << K << endl;
     word = read_char(K);
 
     do
@@ -126,6 +135,7 @@ int main(int argc, char **argv)
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
+            total_characters++;
             actual_index++;
         }
 
@@ -135,12 +145,16 @@ int main(int argc, char **argv)
     //     cout<<"k_word_read_vector["<<j<<"] => "<<k_word_read_vector[j]<<endl;
     // }
     // print_unordered_map();
-    cout << "bits int => " << int(bits) << endl;
+    cout << "total_bits-" << int(bits) << endl;
+    float average_bits = bits / total_characters;
+    cout << "Average_number_of_bits-" << average_bits << endl;
+    //print_char_average_bits();
 
     auto end = chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
 
-    cout << "Elapsed time: " << elapsed.count() << " seconds" << std::endl;
+    //cout << "Elapsed time: " << elapsed.count() << " seconds" << std::endl;
+    cout << "Elapsed_time-" << elapsed.count() << std::endl;
     return 0;
 }
 
@@ -206,6 +220,25 @@ void predict(char **argv)
 
             // get the predicted next char
             predicted_next_char = k_word_read_vector[d + 1][k_word_read_vector[d + 1].size() - 1];
+
+
+
+
+            //count the number of occurrences of each char
+            if(char_occurrences.find(predicted_next_char) == char_occurrences.end()){
+                char_occurrences[predicted_next_char] = 1;
+            }else{
+                char_occurrences[predicted_next_char]++;
+            }
+        
+            if (char_bits.find(predicted_next_char) == char_bits.end())
+            {
+                char_bits[predicted_next_char] = calculate_bits(prob_hit);
+            }
+            else
+            {
+                char_bits[predicted_next_char] += calculate_bits(prob_hit);
+            }
 
             //  if the next char is the same as the predicted one, then we have a hit
             if (predicted_next_char == word[word.size() - 1])
@@ -295,7 +328,6 @@ void predict(char **argv)
     }
     actual_index = lowest_index;
     bits += lowest_bits;
-
 }
 
 
@@ -379,4 +411,17 @@ void bring_back(int k)
         file.open(file_name);
     }
     file.seekg(-k, ios::cur);
+}
+
+void print_char_average_bits()
+{
+    //cout << "Average number of bits per character:" << endl;
+    for (const auto &entry : char_bits)
+    {
+        char character = entry.first;
+        float total_bits = entry.second;
+        int occurrences = char_occurrences[character];
+        float result = occurrences == 0 ? 0 : total_bits / occurrences;
+        //cout << character << ": " << result << endl;
+    }
 }
