@@ -98,6 +98,7 @@ int main(int argc, char **argv)
         }
     }
 
+    cout << "alpha " << alpha << endl;
     word = read_char(K);
 
     do
