@@ -21,7 +21,7 @@ for filename in glob.glob('*'):
             for line in f:
                 line_splited = line.strip().split("-")
                 if line_splited[0] == 'alpha':
-                    alpha.append(int(line_splited[1]))
+                    alpha.append(float(line_splited[1]))
                 elif line_splited[0] == 'threshold':
                     threshold.append(int(line_splited[1]))
                 elif line_splited[0] == 'K':
@@ -34,8 +34,30 @@ for filename in glob.glob('*'):
                     elapsed_time.append(float(line_splited[1]))
 
 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(k, threshold, total_bits)
+ax.set_xlabel('K')
+ax.set_ylabel('threshold')
+ax.set_zlabel('Total bits')
+ax.set_title('Total bits vs K and threshold')
+
+plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(k, threshold, elapsed_time)
+ax.set_xlabel('K')
+ax.set_ylabel('threshold')
+ax.set_zlabel('elapsed time')
+ax.set_title('Elapsed time vs K and threshold')
+
+plt.show()
+
 # K vs Total bits
-plt.plot(k, total_bits, '-ro')
+plt.plot(k, total_bits, 'ro')
 plt.xlabel('K')
 plt.ylabel('Total bits')
 plt.title('Total bits vs K')
