@@ -116,10 +116,6 @@ int main(int argc, char **argv)
         if (word == "")
             break;
         //cout << "actual_index => " << actual_index << endl;
-        if (actual_index % 10000 == 0)
-        {
-            cout << "actual_index => " << actual_index << endl;
-        }
 
         if (un_map.count(word) >0)
         {
@@ -153,7 +149,7 @@ int main(int argc, char **argv)
     cout << "total_bits-" << int(bits) << endl;
     float average_bits = bits / total_characters;
     cout << "Average_number_of_bits-" << average_bits << endl;
-    //print_char_average_bits();
+    print_char_average_bits();
 
     auto end = chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
@@ -330,11 +326,13 @@ void predict(char **argv)
     // if the next char is empty, then we have reached the end of the file
     if (word == "")
     {
-        cout << "EOF" << endl;
+        //cout << "EOF" << endl;
         end_of_file = true;
     }
     actual_index = lowest_index;
     bits += lowest_bits;
+
+    cout << "avg bits: " << bits_to_write << endl;
 }
 
 
