@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <unistd.h>
+#include <cstdlib>
+#include <chrono>
 
 using namespace std;
 
@@ -33,7 +36,7 @@ static string file_name;
 static ifstream file;
 
 static vector<string> k_word_read_vector;
-static int alpha = 1;
+static float alpha = 1;
 static int K = 4;
 static string word;
 
@@ -66,21 +69,43 @@ float calculate_bits(float prob)
 
 int main(int argc, char **argv)
 {
+    auto start = std::chrono::high_resolution_clock::now();
 
     if (argc < 2)
         printf("[usage]: %s file_path", argv[0]);
 
+    int opt;
     actual_index = 0;
-    file_name = argv[1];
+
+
+    while ((opt = getopt(argc, argv, "f:a:t:k:")) != -1) {
+        switch (opt) {
+            case 'f':
+                file_name = optarg;
+                break;
+            case 'a':
+                alpha = atof(optarg);
+                break;
+            case 't':
+                threshold = atof(optarg); // changed to atof()
+                break;
+            case 'k':
+                K = atoi(optarg);
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " -f <string> -a <int> -t <float> -k <int>" << std::endl;
+                return 1;
+        }
+    }
+
     word = read_char(K);
 
     do
     {
-
         if (word == "")
             break;
         //cout << "content => " << word << endl;
-        cout << "actual_index => " << actual_index << endl;
+        //cout << "actual_index => " << actual_index << endl;
 
         if (std::find(k_word_read_vector.begin(), k_word_read_vector.end(), word) != k_word_read_vector.end())
         {
@@ -111,7 +136,10 @@ int main(int argc, char **argv)
     // print_unordered_map();
     cout << "bits int => " << int(bits) << endl;
 
+    auto end = chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
 
+    cout << "Elapsed time: " << elapsed.count() << " seconds" << std::endl;
     return 0;
 }
 
