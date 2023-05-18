@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <chrono>
 
+#include "cpm.hpp"
+
 using namespace std;
 
 ///////////////////////////////////////////////////////
@@ -27,22 +29,32 @@ void print_words_read_list(list<string> words_read);
 
 void print_unordered_map();
 
-void predict(char **argv);
+void predict();
+
+void print_char_average_bits();
+
+int apply_cpm(string filename, int k, float t, float a);
 
 /////////////// global variables //////////////////////
 
 static unordered_map<string, list<int> > un_map;
+static unordered_map<char, float> char_bits;
+static unordered_map<char, int> char_occurrences;
+
+static string file_name;
 static ifstream file;
 
 static vector<string> k_word_read_vector;
 static float alpha = 1;
 static int K = 4;
 static string word;
+static int total_characters = 0;
+
 
 static int N_hits = 0;
 static int N_fails = 0;
 static float threshold = 4;
-static int map_size = 4;
+static long unsigned map_size = 4;
 float bits = 0;
 char predicted_next_char;
 
@@ -51,6 +63,7 @@ float lowest_bits = 0;
 int lowest_index = 0;
 int actual_index = 0;
 bool end_of_file = false;
+
 
 
 ///////////////////////////////////////////////////////
@@ -66,85 +79,54 @@ float calculate_bits(float prob)
     return (float)-log2(prob);
 }
 
-int main(int argc, char **argv)
+int apply_cpm(string filename, int k, float t, float a)
 {
-    auto start = std::chrono::high_resolution_clock::now();
 
-    if (argc < 2)
-        printf("[usage]: %s file_path", argv[0]);
+    alpha = a; K = k; threshold = t; file_name = filename;
 
-    int opt;
-    actual_index = 0;
+    cout << "alpha-" << alpha << endl;
+    cout << "threshold-" << threshold << endl;
+    cout << "K-" << K << endl;
 
-
-    while ((opt = getopt(argc, argv, "f:a:t:k:")) != -1) {
-        switch (opt) {
-            case 'f':
-                file_name = optarg;
-                break;
-            case 'a':
-                alpha = atof(optarg);
-                break;
-            case 't':
-                threshold = atof(optarg); // changed to atof()
-                break;
-            case 'k':
-                K = atoi(optarg);
-                break;
-            default:
-                std::cerr << "Usage: " << argv[0] << " -f <string> -a <int> -t <float> -k <int>" << std::endl;
-                return 1;
-        }
-    }
-
-    cout << "alpha " << alpha << endl;
     word = read_char(K);
 
-    do
-    {
-        if (word == "")
-            break;
-        //cout << "content => " << word << endl;
-        //cout << "actual_index => " << actual_index << endl;
+    do {
+        if (word == "") break;
 
-        if (std::find(k_word_read_vector.begin(), k_word_read_vector.end(), word) != k_word_read_vector.end())
-        {
-            predict(argv);
-        }
-        else
-        {
+        if (un_map.count(word) > 0) {
+            predict();
+
+        } else {
             //  the map mantains only (map_size) references to the words, so if we have more than that words, we remove the oldest one
-            if (un_map[word].size() > map_size)
-            {
+            if (un_map[word].size() > map_size) {
                 un_map[word].pop_front();
             }
+
             // add the word to the list
             k_word_read_vector.push_back(word);
+
             // add the word to the map
             un_map[word].push_back(k_word_read_vector.size() - 1);
+
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
+            total_characters++;
             actual_index++;
         }
 
     } while (!end_of_file);
-    // print k_word_read_vector just to check
-    // for (int j=0; j<k_word_read_vector.size(); j++){
-    //     cout<<"k_word_read_vector["<<j<<"] => "<<k_word_read_vector[j]<<endl;
-    // }
-    // print_unordered_map();
-    cout << "bits int => " << int(bits) << endl;
 
-    auto end = chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
+    cout << "total_bits-" << int(bits) << endl;
+    float average_bits = bits / total_characters;
+    cout << "Average_number_of_bits-" << average_bits << endl;
+    print_char_average_bits();
 
-    cout << "Elapsed time: " << elapsed.count() << " seconds" << std::endl;
-    return 0;
+    return int(bits);
 }
 
-void predict()
-{
+void predict() {
+    
     string k_string = un_map.find(word)->first;  // dá a key do mapa
     list<int> index = un_map.find(word)->second; // ir buscar os values do map (lista de indices)
 
@@ -206,30 +188,55 @@ void predict()
             // get the predicted next char
             predicted_next_char = k_word_read_vector[d + 1][k_word_read_vector[d + 1].size() - 1];
 
-            //  if the next char is the same as the predicted one, then we have a hit
-            if (predicted_next_char == word[word.size() - 1]) {
-                N_hits++;
 
-            } else {
+
+
+            //count the number of occurrences of each char
+            if(char_occurrences.find(predicted_next_char) == char_occurrences.end()){
+                char_occurrences[predicted_next_char] = 1;
+            }else{
+                char_occurrences[predicted_next_char]++;
+            }
+        
+            if (char_bits.find(predicted_next_char) == char_bits.end())
+            {
+                char_bits[predicted_next_char] = calculate_bits(prob_hit);
+            }
+            else
+            {
+                char_bits[predicted_next_char] += calculate_bits(prob_hit);
+            }
+
+            //  if the next char is the same as the predicted one, then we have a hit
+            if (predicted_next_char == word[word.size() - 1])
+            {
+                N_hits++;
+            }
+            else
+            {
                 N_fails++;
             }
 
             ratio = (float)N_fails;
             // if (isinf(ratio) || isnan(ratio)) ratio = 0; // no caso de usar um ratio entre hits e fails
 
+
+            
             if (N_fails == threshold) break; //threshold reached
 
             // check if this index get farther than the lowest, if so, then we add the word to the map and the list
             if (new_index >= lowest_index)
             {
                 // add the word to the map and the list
-                if (un_map[word].size() > map_size) {
+                if (un_map[word].size() > map_size)
+                {
                     un_map[word].pop_front();
                 }
                 k_word_read_vector.push_back(word);
                 un_map[word].push_back(k_word_read_vector.size() - 1);
                 lowest_index = k_word_read_vector.size() - 1;
             }
+
 
             d++;
         }
@@ -239,7 +246,8 @@ void predict()
         // if the probability of hit is the same as the previous one, then we save the one with the lowest number of bits
         // if the probability of hit is the same as the previous one and the number of bits is the same as the previous one, then we save the one with the lowest index
 
-        if (prob_hit > highest_prob) {
+        if (prob_hit > highest_prob)
+        {
             highest_prob = prob_hit;
             lowest_bits = bits_to_write;
             lowest_index = new_index;
@@ -282,12 +290,13 @@ void predict()
     // if the next char is empty, then we have reached the end of the file
     if (word == "")
     {
-        cout << "EOF" << endl;
+        //cout << "EOF" << endl;
         end_of_file = true;
     }
     actual_index = lowest_index;
     bits += lowest_bits;
 
+    cout << "avg bits: " << bits_to_write << endl;
 }
 
 
@@ -322,7 +331,7 @@ bool contains(list<string> list, string element)
 }
 
 // Function to read and return "k" chars from the file every time it is called
-string read_char(string file_name, int k)
+string read_char(int k)
 {
 
     static string c;
@@ -337,6 +346,8 @@ string read_char(string file_name, int k)
         char buffer[k];
         file.read(buffer, k);
         c = string(buffer, k);
+        bits += log2(4) * k;
+
     }
     // else bring the pointer k-1 positions back and read k chars
     else
@@ -355,6 +366,7 @@ string read_char(string file_name, int k)
     // if it is the end of the file, close the file
     if (file.eof())
     {
+        end_of_file = true;
         file.close();
         return "";
     }
@@ -371,4 +383,17 @@ void bring_back(int k)
         file.open(file_name);
     }
     file.seekg(-k, ios::cur);
+}
+
+void print_char_average_bits()
+{
+    //cout << "Average number of bits per character:" << endl;
+    /* for (const auto &entry : char_bits)
+    {
+        char character = entry.first;
+        float total_bits = entry.second;
+        int occurrences = char_occurrences[character];
+        float result = occurrences == 0 ? 0 : total_bits / occurrences;
+        //cout << character << ": " << result << endl;
+    } */
 }
