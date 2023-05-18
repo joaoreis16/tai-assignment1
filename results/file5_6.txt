@@ -1,7 +1,0 @@
-alpha-0.25
-threshold-6
-K-5
-EOF
-total_bits-23753250
-Average_number_of_bits-83344.7
-Elapsed_time-1051.42

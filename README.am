@@ -1,8 +1,0 @@
--log2(P(e)) = I(e) # quantidade de informação
-
-P(e) --> 1
-lim[P(e)=1] -log2(P(e)) --> 0       # quando maior, menos info útil
-
-
-P(e) --> 0
-lim[P(e)=0] -log2(P(e)) --> inf     # quando menor, mais info útil
