@@ -9,6 +9,10 @@
 #include <vector>
 #include <tuple>
 #include <random>
+#include <unistd.h>
+#include <cstdlib>
+#include <chrono>
+
 
 using namespace std;
 
@@ -43,15 +47,24 @@ std::mt19937 gen(rd());
 
 int main(int argc, char **argv)
 {
-    file_name = argv[1];
-    if (argc > 2)
-    {
-        N = atoi(argv[2]);
+     int opt;
+    while ((opt = getopt(argc, argv, "f:n:k:")) != -1) {
+        switch (opt) {
+            case 'f':
+                file_name = optarg;
+                break;
+            case 'n':
+                N = atoi(optarg);
+                break;
+            case 'k':
+                K = atoi(optarg);
+                break;
+            default:
+                cout << "Usage: " << argv[0] << " -f <file_name> -n <number_of_chars_to_predict> -k <number_of_chars_to_read>" << endl;
+                exit(1);
+        }
     }
-    if (argc > 3)
-    {
-        K = atoi(argv[3]);
-    }
+
     read_file();
     calculate_probabilities();
     for (int i = 0; i <= N; i++)
@@ -59,7 +72,7 @@ int main(int argc, char **argv)
         predict();
 
     }
-    print_unordered_map();
+    //print_unordered_map();
     write_to_file();
 
     return 0;
@@ -67,6 +80,7 @@ int main(int argc, char **argv)
 
 void read_file()
 {
+    cout << "Reading file: " << file_name << endl;
     file.open(file_name);
     if (!file.is_open())
     {
@@ -79,6 +93,7 @@ void read_file()
     {
         char c;
         file.get(c);
+        cout << "c: " << c << endl;
         if (find(different_symbols.begin(), different_symbols.end(), c) == different_symbols.end())
         {
             different_symbols.push_back(c);
@@ -93,6 +108,7 @@ void read_file()
     {
         char c;
         file.get(c);
+        cout << "c: " << c << endl;
         if (find(different_symbols.begin(), different_symbols.end(), c) == different_symbols.end())
         {
             different_symbols.push_back(c);
@@ -150,6 +166,7 @@ void print_unordered_map()
 
 void predict()
 {
+    bool all_zero = true;
     // predict next char of the file based on the probabilities calculated
 
     //get the last K characters of the file
@@ -170,15 +187,50 @@ void predict()
     for (int i = 0; i < probabilities.size(); i++)
     {
         probabilities[i] = probabilities[i] / sum;
+        // if its Nan then set it to 0
+        if (probabilities[i] != probabilities[i])
+        {
+            probabilities[i] = 0;
+        }
+        if (probabilities[i] != 0)
+        {
+            all_zero = false;
+        }
+
     }
+    //check if all probabilities are 0
+    if (all_zero)
+    {
+        // if all probabilities are 0 then set them all to 1/N
+        for (int i = 0; i < probabilities.size(); i++)
+        {
+            probabilities[i] = 1.0 / N_different_symbols;
+        }
+    }
+
+    cout<< "word: " << word << endl;
+    cout << "sum: " << sum << endl;
+
+    cout << "probabilities: " << endl;
+    for (int i = 0; i < probabilities.size(); i++)
+    {
+        cout << probabilities[i] << " ";
+    }
+    cout << endl;
     
     //pick a letter random using the probabilities calculated
-
     std::discrete_distribution<> d(probabilities.begin(), probabilities.end());
 
     int letter = d(gen);
+    cout << "letter: " << letter << endl;
     
     char next_char = different_symbols[letter];
+    cout << "next char: " << next_char << endl;
+    //print all characters
+    for (int i = 0; i < different_symbols.size(); i++)
+    {
+        cout << different_symbols[i] << " ";
+    }
     
     // update the probabilities of the last K characters
     un_map[word][letter]++;
