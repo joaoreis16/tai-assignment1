@@ -20,6 +20,8 @@ void bring_back_target(int k);
 
 float get_estimated_bits(string target_file_name, string ri_filename, int k, float t, float a);
 
+void reset();
+
 
 /////////////////////global variables/////////////////////////
 
@@ -100,7 +102,7 @@ float get_estimated_bits(string target_file_name, string filename, int k, float 
     float bits = estimate_bits(text_filename, model, vector_model);
 
     // reset structures
-    // to do
+    reset();
 
     return bits;
 }
@@ -259,4 +261,12 @@ void bring_back_target(int k)
         target_file.open(text_filename);
     }
     target_file.seekg(-k, ios::cur);
+}
+
+
+void reset() {
+    end_of_file_target = false;
+    bits = 0;
+    n_Fails = 0;
+    n_Hits = 0;
 }

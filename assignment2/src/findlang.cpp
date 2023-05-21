@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
         float bits = get_estimated_bits(target_text, filename, K, threshold, alpha);
         cout << "estimated bits = " << bits << endl;
 
-        if (bits < min_bits) {
+        if (bits < min_bits && bits != 0) {
             min_bits = bits;
             lang_found = filename;
         }
