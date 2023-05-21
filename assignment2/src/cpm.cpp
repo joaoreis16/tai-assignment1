@@ -35,6 +35,10 @@ void print_char_average_bits();
 
 int apply_cpm(string filename, int k, float t, float a);
 
+unordered_map<string, list<int> > get_un_map();
+
+vector<string> get_k_word_read_vector();
+
 /////////////// global variables //////////////////////
 
 static unordered_map<string, list<int> > un_map;
@@ -397,3 +401,14 @@ void print_char_average_bits()
         //cout << character << ": " << result << endl;
     } */
 }
+
+unordered_map<string, list<int> > get_un_map()
+{
+    return un_map;
+}
+
+vector<string> get_k_word_read_vector()
+{
+    return k_word_read_vector;
+}
+
