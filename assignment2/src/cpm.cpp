@@ -54,7 +54,6 @@ static int K = 4;
 static string word;
 static int total_characters = 0;
 
-
 static int N_hits = 0;
 static int N_fails = 0;
 static float threshold = 4;
@@ -402,13 +401,11 @@ void print_char_average_bits()
     } */
 }
 
-unordered_map<string, list<int> > get_un_map()
-{
+unordered_map<string, list<int> > get_un_map() {
     return un_map;
 }
 
-vector<string> get_k_word_read_vector()
-{
+vector<string> get_k_word_read_vector() {
     return k_word_read_vector;
 }
 

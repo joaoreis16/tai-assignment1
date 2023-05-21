@@ -18,6 +18,8 @@ string read_word (int k);
 // Function to bring the pointer k positions back
 void bring_back_target(int k);
 
+float get_estimated_bits(string target_file_name, string ri_filename, int k, float t, float a);
+
 
 /////////////////////global variables/////////////////////////
 
@@ -44,10 +46,10 @@ static char predicted_next_char;
 
 //////////////////////////////////////////////////////////////
 
-int main(int argc, char* argv[]) {
+/* int main(int argc, char* argv[]) {
 
     if (argc < 3) {
-        cerr << "Usage: ./lang <ri_file> <analysis_file> <model_parameters>" << endl;
+        cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
         return 1;
     }
 
@@ -68,28 +70,34 @@ int main(int argc, char* argv[]) {
                 K = atoi(optarg);
                 break;
             default:
-                std::cerr << "Usage: ./lang <ri_file> <analysis_file> -a <int> -t <float> -k <int>" << std::endl;
+                std::cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << std::endl;
                 return 1;
         }
     }
 
+    float bits = get_estimated_bits(text_filename, ri_filename, K, threshold, alpha);
+    cout << "[lang.cpp]: estimated bits = " << bits << endl;
+    return 0;
+} */
+
+float get_estimated_bits(string target_file_name, string ri_filename, int k, float t, float a) {
+
     // apply the copy model
     int num_bits = apply_cpm(ri_filename, K, threshold, alpha);
     cout << "[lang.cpp]: total bits = " << num_bits << endl;
-    //get un_map from cpm.cpp
+
+    // get un_map from cpm.cpp
     model = get_un_map();
-    //get k_word_read_vector from cpm.cpp
+
+    // get k_word_read_vector from cpm.cpp
     vector_model = get_k_word_read_vector();
 
     // estimate bits for the target file
-    bits = estimate_bits(text_filename, model, vector_model);
-    cout << "[lang.cpp]: estimated bits = " << bits << endl;
-
-    return 0;
+    return estimate_bits(text_filename, model, vector_model);
 }
 
 // Function to calculate estimate bits for the target file using the un_map model and the k_word_read_vector
-float estimate_bits(string target_file_name, unordered_map<string, list<int> > model, vector<string> vector_model) {
+float estimate_bits(string target_file_name, unordered_map<string, list<int>> model, vector<string> vector_model) {
 
     // read the target file
     string word = read_word(K);
@@ -116,7 +124,7 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int> > m
                 float ratio = (float)n_Fails;
                 int j = i;
 
-                while (ratio<threshold){
+                while (ratio < threshold){
                     // calculate the bits to write and update the next_word to get the next char
                     bits_to_write += calculate_bits(calculate_probability(word_from_vector, next_char));
                     next_word = read_word(K);
@@ -144,7 +152,7 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int> > m
                 }
 
                 // if the ratio is equal to the threshold bring back the pointer for initial word and if the bits_to_write is less than the best_bits, update the best_bits
-                if (ratio==threshold){
+                if (ratio == threshold){
                     int back = j-i;
                     bring_back_target(back+1);
                     word = read_word(K);
@@ -165,9 +173,6 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int> > m
                 }
 
                 bits += best_bits;
-
-
-
             }
 
         }
@@ -183,7 +188,7 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int> > m
     return bits;
 }
 
-string read_word ( int k) {
+string read_word (int k) {
     static string c;
     if (target_file.eof())
     {
