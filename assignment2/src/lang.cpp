@@ -80,7 +80,11 @@ static char predicted_next_char;
     return 0;
 } */
 
-float get_estimated_bits(string target_file_name, string ri_filename, int k, float t, float a) {
+float get_estimated_bits(string target_file_name, string filename, int k, float t, float a) {
+
+    text_filename = target_file_name;
+    ri_filename   = filename;
+    alpha = a;  K = k; threshold = t; 
 
     // apply the copy model
     int num_bits = apply_cpm(ri_filename, K, threshold, alpha);
@@ -93,7 +97,12 @@ float get_estimated_bits(string target_file_name, string ri_filename, int k, flo
     vector_model = get_k_word_read_vector();
 
     // estimate bits for the target file
-    return estimate_bits(text_filename, model, vector_model);
+    float bits = estimate_bits(text_filename, model, vector_model);
+
+    // reset structures
+    // to do
+
+    return bits;
 }
 
 // Function to calculate estimate bits for the target file using the un_map model and the k_word_read_vector
