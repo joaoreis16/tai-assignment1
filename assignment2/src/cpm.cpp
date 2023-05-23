@@ -441,6 +441,8 @@ void reset_cpm() {
     un_map.clear(); char_bits.clear(); char_occurrences.clear(); k_word_read_vector.clear();
 
     total_characters = 0;
+    different_symbols = "";
+    N_different_symbols = 0;
 
     N_hits = 0;
     N_fails = 0;
