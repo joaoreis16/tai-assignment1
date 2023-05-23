@@ -144,6 +144,8 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
 
             for (int i : freq_list) {
 
+                cout << "[lang.cpp]: is last? = " << freq_list.back() << endl;
+
                 cout << "[lang.cpp]: freq_list = " << i << endl;
                 // get word from the vector_model
                 string word_from_vector = vector_model[i];
@@ -159,8 +161,9 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
                 while (ratio < threshold){
                     // calculate the bits to write and update the next_word to get the next char
                     bits_to_write += calculate_bits(calculate_probability(word_from_vector, next_char));
+                    
                     next_word = read_word(K);
-
+                    
                     //in case the file ends before the threshold is reached
                     if (next_word == ""){
                         break;
@@ -168,7 +171,16 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
 
                     // get the next char from the next_word and from the vector_model 
                     next_char = next_word[next_word.size()-1];
+
+                    // check if we can get the predicted next char, if not break the loop and update the ratio
+                    if (j+1 >= vector_model.size()){
+                        n_Fails++;
+                        ratio = (float)n_Fails;
+                        break;
+                    }
+                    
                     predicted_next_char = vector_model[j+1][vector_model[j+1].size()-1];
+
 
                     // check if the next char is equal to the predicted next char and update the hits and fails
                     if (next_char == predicted_next_char){
@@ -184,7 +196,8 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
                 }
 
                 // if the ratio is equal to the threshold bring back the pointer for initial word and if the bits_to_write is less than the best_bits, update the best_bits
-                if (ratio == threshold){
+                //check if is the last index of the vector_model
+                if (ratio == threshold && freq_list.back() != i){
                     int back = j-i;
                     bring_back_target(back+1);
                     word = read_word(K);
