@@ -144,8 +144,6 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
 
             for (int i : freq_list) {
 
-                cout << "[lang.cpp]: is last? = " << freq_list.back() << endl;
-
                 cout << "[lang.cpp]: freq_list = " << i << endl;
                 // get word from the vector_model
                 string word_from_vector = vector_model[i];
