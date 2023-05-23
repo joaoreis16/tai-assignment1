@@ -9,6 +9,8 @@
 g++ -std=c++11 -Wall lang.cpp cpm.cpp -o lang
 
 ./lang <ri_file> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )
+
+./lang text.txt text.txt
 ```
 
 2. findlang.cpp

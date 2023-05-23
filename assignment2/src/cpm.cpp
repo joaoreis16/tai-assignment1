@@ -31,6 +31,8 @@ void print_unordered_map();
 
 void predict();
 
+void reset_cpm();
+
 void print_char_average_bits();
 
 int apply_cpm(string filename, int k, float t, float a);
@@ -68,7 +70,6 @@ int actual_index = 0;
 bool end_of_file = false;
 
 
-
 ///////////////////////////////////////////////////////
 
 float calculate_probability(string word, char next_char)
@@ -82,16 +83,17 @@ float calculate_bits(float prob)
     return (float)-log2(prob);
 }
 
-int apply_cpm(string filename, int k, float t, float a)
-{
+int apply_cpm(string filename, int k, float t, float a) {
 
     alpha = a; K = k; threshold = t; file_name = filename;
+    reset_cpm();
 
-    cout << "alpha-" << alpha << endl;
-    cout << "threshold-" << threshold << endl;
-    cout << "K-" << K << endl;
+    cout << "[cpm.cpp]: alpha = " << alpha << endl;
+    cout << "[cpm.cpp]: threshold = " << threshold << endl;
+    cout << "[cpm.cpp]: K = " << K << endl;
 
     word = read_char(K);
+    cout << "[cpm.cpp]: word = " << word << endl;
 
     do {
         if (word == "") break;
@@ -114,15 +116,16 @@ int apply_cpm(string filename, int k, float t, float a)
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
+            cout << "[cpm.cpp]: word = " << word << endl;
             total_characters++;
             actual_index++;
         }
 
     } while (!end_of_file);
 
-    cout << "total_bits-" << int(bits) << endl;
+    cout << "[cpm.cpp]: total_bits = " << int(bits) << endl;
     float average_bits = bits / total_characters;
-    cout << "Average_number_of_bits-" << average_bits << endl;
+    cout << "[cpm.cpp]: Average_number_of_bits = " << average_bits << endl;
     print_char_average_bits();
 
     return int(bits);
@@ -181,18 +184,17 @@ void predict() {
         {
             word = read_char(K);
             new_index++;
+
             if (word == "") break;
+
             // calculate the probability of hit
             prob_hit = calculate_probability(k_string, predicted_next_char);
 
-            //  calculate the number of bits
+            // calculate the number of bits
             bits_to_write += calculate_bits(prob_hit);
 
             // get the predicted next char
             predicted_next_char = k_word_read_vector[d + 1][k_word_read_vector[d + 1].size() - 1];
-
-
-
 
             //count the number of occurrences of each char
             if(char_occurrences.find(predicted_next_char) == char_occurrences.end()){
@@ -340,16 +342,19 @@ string read_char(int k)
     static string c;
     if (file.eof())
     {
+        cout << "[cpm.cpp]: ending file " << file_name << endl;
         end_of_file = true;
         return "";
     }
     if (!file.is_open())
     {
+        cout << "[cpm.cpp]: opening file " << file_name << endl;
         file.open(file_name);
         char buffer[k];
         file.read(buffer, k);
         c = string(buffer, k);
         bits += log2(4) * k;
+        // cout << "[cpm.cpp]: c = " << c << endl;
 
     }
     // else bring the pointer k-1 positions back and read k chars
@@ -409,3 +414,23 @@ vector<string> get_k_word_read_vector() {
     return k_word_read_vector;
 }
 
+
+void reset_cpm() {
+    file = ifstream();
+
+    un_map.clear(); char_bits.clear(); char_occurrences.clear(); k_word_read_vector.clear();
+
+    total_characters = 0;
+
+    N_hits = 0;
+    N_fails = 0;
+    threshold = 4;
+    map_size = 4;
+    bits = 0;
+
+    highest_prob = 0;
+    lowest_bits = 0;
+    lowest_index = 0;
+    actual_index = 0;
+    end_of_file = false;
+}

@@ -58,6 +58,22 @@ static char predicted_next_char;
     ri_filename   = argv[1];
     text_filename = argv[2];
 
+    // to check if the file exist
+    ifstream file_exist(ri_filename);
+    if (!file_exist.good()) {
+        // File does not exist
+        cout << "[ERROR]: file '" << ri_filename << "' does not exist." << endl;
+        exit(0);
+    }
+
+    // to check if the file exist
+    ifstream file_exist1(text_filename);
+    if (!file_exist1.good()) {
+        // File does not exist
+        cout << "[ERROR]: file '" << text_filename << "' does not exist." << endl;
+        exit(0);
+    }
+
     //read the parameters
     int opt;
     while ((opt = getopt(argc, argv, "a:t:k:")) != -1) {
@@ -82,11 +98,14 @@ static char predicted_next_char;
     return 0;
 } */
 
-float get_estimated_bits(string target_file_name, string filename, int k, float t, float a) {
+float get_estimated_bits(string target_filename, string filename, int k, float t, float a) {
 
-    text_filename = target_file_name;
-    ri_filename   = filename;
-    alpha = a;  K = k; threshold = t; 
+    // reset structures
+    reset();
+
+    text_filename = target_filename;
+    ri_filename = filename;
+    alpha = a; K = k; threshold = t; 
 
     // apply the copy model
     int num_bits = apply_cpm(ri_filename, K, threshold, alpha);
@@ -99,10 +118,7 @@ float get_estimated_bits(string target_file_name, string filename, int k, float 
     vector_model = get_k_word_read_vector();
 
     // estimate bits for the target file
-    float bits = estimate_bits(text_filename, model, vector_model);
-
-    // reset structures
-    reset();
+    float bits = estimate_bits(target_filename, model, vector_model);
 
     return bits;
 }
@@ -265,6 +281,7 @@ void bring_back_target(int k)
 
 
 void reset() {
+    target_file = ifstream();
     end_of_file_target = false;
     bits = 0;
     n_Fails = 0;

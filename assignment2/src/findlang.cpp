@@ -69,9 +69,15 @@ int main(int argc, char* argv[]) {
     string lang_found;
     float min_bits = 99999999999.0;
     for (const auto& filename : all_files) {
+
+        std::string folder;
+        folder.assign(ri_folder);
+        string temp = folder + "/";
+        string file_path = temp + filename;
+
         cout << "\n\n>> file: " << filename << endl;  // Print the file name
 
-        float bits = get_estimated_bits(target_text, filename, K, threshold, alpha);
+        float bits = get_estimated_bits(target_text, file_path, K, threshold, alpha);
         cout << "estimated bits = " << bits << endl;
 
         if (bits < min_bits && bits != 0) {
