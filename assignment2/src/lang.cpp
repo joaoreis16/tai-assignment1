@@ -46,9 +46,11 @@ static int n_Hits = 0;
 static char next_char;
 static char predicted_next_char;
 
+static int N_different_symbols = 0;
+
 //////////////////////////////////////////////////////////////
 
-/* int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
     if (argc < 3) {
         cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
@@ -96,7 +98,7 @@ static char predicted_next_char;
     float bits = get_estimated_bits(text_filename, ri_filename, K, threshold, alpha);
     cout << "[lang.cpp]: estimated bits = " << bits << endl;
     return 0;
-} */
+} 
 
 float get_estimated_bits(string target_filename, string filename, int k, float t, float a) {
 
@@ -116,6 +118,9 @@ float get_estimated_bits(string target_filename, string filename, int k, float t
 
     // get k_word_read_vector from cpm.cpp
     vector_model = get_k_word_read_vector();
+
+    // get different symbols from cpm.cpp
+    N_different_symbols = get_N_different_symbols();
 
     // estimate bits for the target file
     float bits = estimate_bits(target_filename, model, vector_model);
@@ -205,7 +210,7 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
         }
         // if the word is not in the model
         else {
-            bits += log2(4);                    // Nota: descobrir qual deve ser o valor em vez de 4
+            bits += log2(N_different_symbols);                    // Nota: descobrir qual deve ser o valor em vez de 4
         }
         // read the next word
         word = read_word(K);
@@ -230,7 +235,7 @@ string read_word (int k) {
         char buffer[k];
         target_file.read(buffer, k);
         c = string(buffer, k);
-        bits += log2(4) * k;                // Nota: desccobrir qual deve ser o valor em vez de 4
+        bits += log2(N_different_symbols) * k;                // Nota: desccobrir qual deve ser o valor em vez de 4
     }
     // else bring the pointer k-1 positions back and read k chars
     else
@@ -247,7 +252,7 @@ string read_word (int k) {
         
         c = c.substr(0, target_file.gcount());
         if (c.size() < k){
-            bits += log2(4);            // Nota: desccobrir qual deve ser o valor em vez de 4
+            bits += log2(N_different_symbols) * c.size();            // Nota: desccobrir qual deve ser o valor em vez de 4
             end_of_file_target = true;
             target_file.close();
             return "";

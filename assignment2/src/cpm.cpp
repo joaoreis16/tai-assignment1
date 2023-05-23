@@ -41,6 +41,8 @@ unordered_map<string, list<int> > get_un_map();
 
 vector<string> get_k_word_read_vector();
 
+int get_N_different_symbols();
+
 /////////////// global variables //////////////////////
 
 static unordered_map<string, list<int> > un_map;
@@ -69,8 +71,16 @@ int lowest_index = 0;
 int actual_index = 0;
 bool end_of_file = false;
 
+//to get number of different symbols
+static string different_symbols;
+static int N_different_symbols = 0;
+
 
 ///////////////////////////////////////////////////////
+
+int get_N_different_symbols() {
+    return N_different_symbols;
+}
 
 float calculate_probability(string word, char next_char)
 {
@@ -377,6 +387,16 @@ string read_char(int k)
         end_of_file = true;
         file.close();
         return "";
+    }
+
+    //get different symbols
+    for (char ch : c)
+    {
+        if (different_symbols.find(ch) == string::npos)
+        {
+            different_symbols += ch;
+            N_different_symbols++;
+        }
     }
 
     return c;

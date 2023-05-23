@@ -42,4 +42,6 @@ unordered_map<string, list<int> > get_un_map();
 
 vector<string> get_k_word_read_vector();
 
+int get_N_different_symbols();
+
 #endif // MYFUNCTIONS_H
