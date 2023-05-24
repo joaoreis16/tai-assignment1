@@ -10,7 +10,7 @@ g++ -std=c++11 -Wall lang.cpp cpm.cpp -o lang
 
 ./lang <ri_file> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )
 
-./lang text.txt text.txt
+./lang english.txt portuguese.txt
 ```
 
 2. findlang.cpp
@@ -20,5 +20,5 @@ g++ -std=c++11 -Wall findlang.cpp lang.cpp cpm.cpp -o findlang
 
 ./findlang <ri_folder> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )
 
-./findlang lang_files text.txt
+./findlang lang_files portuguese.txt
 ```

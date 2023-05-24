@@ -50,7 +50,7 @@ static int N_different_symbols = 0;
 
 //////////////////////////////////////////////////////////////
 
-int main(int argc, char* argv[]) {
+/* int main(int argc, char* argv[]) {
 
     if (argc < 3) {
         cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
     float bits = get_estimated_bits(text_filename, ri_filename, K, threshold, alpha);
     cout << "[lang.cpp]: estimated bits = " << bits << endl;
     return 0;
-} 
+}  */
 
 float get_estimated_bits(string target_filename, string filename, int k, float t, float a) {
 
