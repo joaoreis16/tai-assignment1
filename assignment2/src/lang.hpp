@@ -27,4 +27,10 @@ void bring_back_target(int k);
 
 float get_estimated_bits(string target_file_name, string ri_filename, int k, float t, float a);
 
+map<int,pair<char,float>> get_char_average_bits();
+
+int get_target_file_size();
+
+map<int, char > get_char_map();
+
 #endif // MYFUNCTIONS_A

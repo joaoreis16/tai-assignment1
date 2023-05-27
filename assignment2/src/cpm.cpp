@@ -100,7 +100,7 @@ int apply_cpm(string filename, int k, float t, float a) {
 
     cout << "[cpm.cpp]: alpha = " << alpha << endl;
     cout << "[cpm.cpp]: threshold = " << threshold << endl;
-    cout << "[cpm.cpp]: K = " << K << endl;
+    //cout << "[cpm.cpp]: K = " << K << endl;
 
     word = read_char(K);
     cout << "[cpm.cpp]: word = " << word << endl;
@@ -126,7 +126,7 @@ int apply_cpm(string filename, int k, float t, float a) {
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
-            cout << "[cpm.cpp]: word = " << word << endl;
+            //cout << "[cpm.cpp]: word = " << word << endl;
             total_characters++;
             actual_index++;
         }
@@ -311,7 +311,6 @@ void predict() {
     actual_index = lowest_index;
     bits += lowest_bits;
 
-    cout << "avg bits: " << bits_to_write << endl;
 }
 
 
@@ -348,43 +347,41 @@ bool contains(list<string> list, string element)
 // Function to read and return "k" chars from the file every time it is called
 string read_char(int k)
 {
-
     static string c;
+
+
     if (file.eof())
     {
         cout << "[cpm.cpp]: ending file " << file_name << endl;
-        end_of_file = true;
+        file.close();
         return "";
     }
+
     if (!file.is_open())
     {
         cout << "[cpm.cpp]: opening file " << file_name << endl;
-        file.open(file_name);
+        file.open(file_name, ios::binary);
+
         char buffer[k];
         file.read(buffer, k);
-        c = string(buffer, k);
+        c = string(buffer, file.gcount());
         bits += log2(4) * k;
-        // cout << "[cpm.cpp]: c = " << c << endl;
-
     }
-    // else bring the pointer k-1 positions back and read k chars
     else
     {
-        // bring the pointer k-1 positions back
         file.seekg(-k + 1, ios::cur);
         char buffer[k];
         file.read(buffer, k);
-        c = string(buffer, k);
+        c = string(buffer, file.gcount());
     }
-    // check if the file has less than k chars
+
     if (file.gcount() < k)
     {
         c = c.substr(0, file.gcount());
     }
-    // if it is the end of the file, close the file
+
     if (file.eof())
     {
-        end_of_file = true;
         file.close();
         return "";
     }
@@ -398,6 +395,8 @@ string read_char(int k)
             N_different_symbols++;
         }
     }
+
+
 
     return c;
 }
@@ -455,4 +454,5 @@ void reset_cpm() {
     lowest_index = 0;
     actual_index = 0;
     end_of_file = false;
+
 }
