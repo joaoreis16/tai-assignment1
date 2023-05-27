@@ -75,6 +75,7 @@ bool end_of_file = false;
 static string different_symbols;
 static int N_different_symbols = 0;
 
+FiniteContextModel fcmodel(K); // Create a finite-context model with order 3
 
 ///////////////////////////////////////////////////////
 
@@ -96,6 +97,7 @@ float calculate_bits(float prob)
 int apply_cpm(string filename, int k, float t, float a) {
 
     alpha = a; K = k; threshold = t; file_name = filename;
+    fcmodel.set_order(K);
     reset_cpm();
 
     cout << "[cpm.cpp]: alpha = " << alpha << endl;
@@ -456,3 +458,56 @@ void reset_cpm() {
     end_of_file = false;
 
 }
+
+
+
+// ///////////////////// Finite Context Model Class ///////////////////// //
+
+class FiniteContextModel {
+    private:
+        unordered_map<string, unordered_map<char, int>> symbolCounts;
+        unordered_map<string, int> KWordCounts;
+        int order;
+
+    public:
+        FiniteContextModel(int order) : order(order) {}
+
+        void train(const vector<char>& sequence) {
+            for (long unsigned int i = order; i < sequence.size(); i++) {
+                string kword = get_k_word(sequence, i);
+                char next_symbol = sequence[i];
+                
+                symbolCounts[kword][next_symbol]++;
+                KWordCounts[kword]++;
+            }
+        }
+
+        double get_probability(const vector<char>& sequence, char symbol) {
+            string kword = get_k_word(sequence, sequence.size());
+            int KWordCount = KWordCounts[kword];
+            int symbolCount = symbolCounts[kword][symbol];
+            
+            if (KWordCount == 0) return 0.0;
+            return static_cast<double>(symbolCount) / KWordCount;
+        }
+
+        void set_order(int order) {
+            order = order;
+
+            // reset the structures
+            symbolCounts = unordered_map<string, unordered_map<char, int>>;
+            KWordCounts  = unordered_map<string, int>;
+        }
+
+    private:
+        string get_k_word(const vector<char>& sequence, int currentIndex) {
+            string word = "";
+            int startIndex = currentIndex - order;
+            
+            for (int i = startIndex; i < currentIndex; i++) {
+                word += sequence[i];
+            }
+
+            return word;
+        }
+};
