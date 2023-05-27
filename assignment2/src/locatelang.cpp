@@ -17,6 +17,7 @@ static float threshold = 10;
 static float alpha = 0.9;
 
 static map<int, char> index_char;
+static bool fcmodel_flag = false;
 
 //map to save the index and the language
 map<int, string> index_lang;
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     // read the parameters
     int opt;
-    while ((opt = getopt(argc, argv, "a:t:k:")) != -1) {
+    while ((opt = getopt(argc, argv, "a:t:k:f")) != -1) {
         switch (opt) {
             case 'a':
                 alpha = atof(optarg);
@@ -43,6 +44,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'k':
                 K = atoi(optarg);
+                break;
+            case 'f':
+                fcmodel_flag = true;
                 break;
             default:
                 cerr << "Usage: ./locatelang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
@@ -79,10 +83,26 @@ int main(int argc, char* argv[]) {
         folder.assign(ri_folder);
         string temp = folder + "/";
         string file_path = temp + filename;
+
         // calculate the estimated bits
-        float estimated_bits = get_estimated_bits(target_text, file_path, K, threshold, alpha);
+        float estimated_bits;
+        if (fcmodel_flag) {
+            train_fcm(file_path, K, threshold, alpha);
+
+            estimated_bits = apply_fcm(target_text);
+
+        } else {
+            estimated_bits = get_estimated_bits(target_text, file_path, K, threshold, alpha);
+        }
+        
         // get un_map with symbols and their bits
-        map<int,pair<char,float>> bits_map = get_char_average_bits();
+        map<int,pair<char,float>> bits_map;
+        if (fcmodel_flag) {
+            bits_map = get_char_bits();
+
+        } else {
+            bits_map = get_char_average_bits();
+        }
 
         int N_diff_symbols = get_N_different_symbols();
         file_sizes[filename] = N_diff_symbols;
@@ -156,7 +176,7 @@ int main(int argc, char* argv[]) {
     //for each index in the target text get the lowest value of all the maps
     //if the lowest value is the same for all the maps, then the language is the same
     //if the lowest value is different, then the language is different
-    int target_file_size = get_target_file_size();
+    int target_file_size = get_target_file_size(target_text);
     cout << "target_file_size: " << target_file_size << endl;
     string language = "";
     string word = "";
@@ -245,18 +265,16 @@ int main(int argc, char* argv[]) {
     }
 
 
-
-
     //print index_lang
     for (auto it = index_lang.begin(); it != index_lang.end(); it++) {
         cout << "Index: " << it->first << " Language: " << it->second << endl;
     }
 
     //print the result in the console with colors for each language detected and print the legend
-    string console_print_begin = "";
-    string console_print_end = "";
-
     for (auto it = index_lang.begin(); it != index_lang.end(); it++) {  
+        string console_print_begin = "";
+        string console_print_end = "";
+        
         if (it->second == "English.utf8"){
             console_print_begin = "\033[1;31m";
             console_print_end = "\033[0m\n";
@@ -329,9 +347,6 @@ int main(int argc, char* argv[]) {
         cout << console_print_end;
         
     }
-
-
-
 
     return 0;
 }

@@ -53,6 +53,8 @@ static char predicted_next_char;
 
 static int N_different_symbols = 0;
 
+static bool fcmodel_flag = false;
+
 // map to save symbols position and the bits for each symbol
 static map<int, pair<char, float> > char_average_bits;
 //ordered map to save symbols position and the symbol
@@ -70,12 +72,11 @@ float calculate_probability_lang(string word, char next_char)
 
 float calculate_bits_lang(float prob)
 {
-    float bits = (float)-log2(prob);
     //cout << "bits: " << bits << endl;
     return (float)-log2(prob);
 }
-/*
- int main(int argc, char* argv[]) {
+
+ /* int main(int argc, char* argv[]) {
 
     if (argc < 3) {
         cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
@@ -103,7 +104,7 @@ float calculate_bits_lang(float prob)
 
     //read the parameters
     int opt;
-    while ((opt = getopt(argc, argv, "a:t:k:")) != -1) {
+    while ((opt = getopt(argc, argv, "a:t:k:f")) != -1) {
         switch (opt) {
             case 'a':
                 alpha = atof(optarg);
@@ -114,13 +115,25 @@ float calculate_bits_lang(float prob)
             case 'k':
                 K = atoi(optarg);
                 break;
+            case 'f':
+                fcmodel_flag = true;
+                break;
             default:
                 std::cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << std::endl;
                 return 1;
         }
     }
 
-    float bits = get_estimated_bits(text_filename, ri_filename, K, threshold, alpha);
+    float bits;
+    if (fcmodel_flag) {
+        train_fcm(ri_filename, K, threshold, alpha);
+
+        bits = apply_fcm(text_filename);
+
+    } else {
+        bits = get_estimated_bits(text_filename, ri_filename, K, threshold, alpha);
+    }
+
     cout << "[lang.cpp]: estimated bits = " << bits << endl;
     return 0;
 }  */
@@ -467,7 +480,7 @@ map<int, pair<char,float>> get_char_average_bits() {
     return char_average_bits;
 }
 
-int get_target_file_size() {
+int get_target_file_size(string text_filename) {
     ifstream file(text_filename, ios::binary | ios::ate);
     int size = file.tellg();
     file.close();

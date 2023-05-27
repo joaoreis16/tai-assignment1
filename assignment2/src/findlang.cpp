@@ -16,6 +16,8 @@ static int K = 4;
 static float threshold = 4;
 static float alpha = 1;
 
+static bool fcmodel_flag = false;
+
 int main(int argc, char* argv[]) {
 
     if (argc < 3) {
@@ -28,7 +30,7 @@ int main(int argc, char* argv[]) {
 
     // read the parameters
     int opt;
-    while ((opt = getopt(argc, argv, "a:t:k:")) != -1) {
+    while ((opt = getopt(argc, argv, "a:t:k:f")) != -1) {
         switch (opt) {
             case 'a':
                 alpha = atof(optarg);
@@ -38,6 +40,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'k':
                 K = atoi(optarg);
+                break;
+            case 'f':
+                fcmodel_flag = true;
                 break;
             default:
                 cerr << "Usage: ./findlang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
@@ -77,7 +82,16 @@ int main(int argc, char* argv[]) {
 
         cout << "\n\n>> file: " << filename << endl;  // Print the file name
 
-        float bits = get_estimated_bits(target_text, file_path, K, threshold, alpha);
+        float bits;
+        if (fcmodel_flag) {
+            train_fcm(file_path, K, threshold, alpha);
+
+            bits = apply_fcm(target_text);
+
+        } else {
+            bits = get_estimated_bits(target_text, file_path, K, threshold, alpha);
+        }
+
         cout << "estimated bits = " << bits << endl;
 
         if (bits < min_bits && bits != 0) {

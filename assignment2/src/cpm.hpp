@@ -36,7 +36,13 @@ void predict();
 
 void print_char_average_bits();
 
+map<int,pair<char,float>> get_char_bits();
+
 int apply_cpm(string filename, int k, float t, float a);
+
+void train_fcm(string filename, int k, float t, float a);
+
+float apply_fcm(string filename);
 
 unordered_map<string, list<int> > get_un_map();
 

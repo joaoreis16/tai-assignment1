@@ -29,7 +29,7 @@ float get_estimated_bits(string target_file_name, string ri_filename, int k, flo
 
 map<int,pair<char,float>> get_char_average_bits();
 
-int get_target_file_size();
+int get_target_file_size(string text_filename);
 
 map<int, char > get_char_map();
 

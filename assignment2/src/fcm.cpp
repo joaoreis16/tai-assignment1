@@ -17,9 +17,6 @@ class FiniteContextModel {
             for (long unsigned int i = order; i < sequence.size(); i++) {
                 string kword = get_k_word(sequence, i);
                 char next_symbol = sequence[i];
-
-                cout << "kword: "  << kword  << endl;
-                cout << "symbol: " << next_symbol << endl;
                 
                 symbolCounts[kword][next_symbol]++;
                 KWordCounts[kword]++;

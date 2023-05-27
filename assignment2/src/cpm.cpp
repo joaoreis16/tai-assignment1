@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <chrono>
+#include <map>
 
 #include "cpm.hpp"
 
@@ -19,7 +20,7 @@ using namespace std;
 
 bool contains(list<string> list, string element);
 
-void read_file();
+vector<char> read_file(string filename);
 
 string read_char(int k);
 
@@ -42,6 +43,8 @@ unordered_map<string, list<int> > get_un_map();
 vector<string> get_k_word_read_vector();
 
 int get_N_different_symbols();
+
+map<int,pair<char,float>> get_char_bits();
 
 /////////////// global variables //////////////////////
 
@@ -75,7 +78,63 @@ bool end_of_file = false;
 static string different_symbols;
 static int N_different_symbols = 0;
 
-FiniteContextModel fcmodel(K); // Create a finite-context model with order 3
+map<int,pair<char,float>> bits_map;
+
+
+// ///////////////////// Finite Context Model Class ///////////////////// //
+
+class FiniteContextModel {
+    private:
+        unordered_map<string, unordered_map<char, int>> symbolCounts;
+        unordered_map<string, int> KWordCounts;
+        int order;
+
+    public:
+        FiniteContextModel(int order) : order(order) {}
+
+        void train(const vector<char>& sequence) {
+            for (long unsigned int i = order; i < sequence.size(); i++) {
+                string kword = get_k_word(sequence, i);
+                char next_symbol = sequence[i];
+                
+                symbolCounts[kword][next_symbol]++;
+                KWordCounts[kword]++;
+            }
+        }
+
+        double get_probability(const vector<char>& sequence, char next_symbol) {
+            string kword = get_k_word(sequence, sequence.size());
+            int KWordCount = KWordCounts[kword];
+            int symbolCount = symbolCounts[kword][next_symbol];
+
+            cout << "KWordCount = " << KWordCount << endl;
+            cout << "symbolCount = " << symbolCount << endl;
+
+            return static_cast<double>((symbolCount) + alpha ) / (KWordCount + alpha * N_different_symbols);
+        }
+
+        void set_order(int order) {
+            order = order;
+
+            // reset the structures
+            symbolCounts = unordered_map<string, unordered_map<char, int>>();
+            KWordCounts  = unordered_map<string, int>();
+        }
+
+    private:
+        string get_k_word(const vector<char>& sequence, int currentIndex) {
+            string word = "";
+            int startIndex = currentIndex - order;
+            
+            for (int i = startIndex; i < currentIndex; i++) {
+                word += sequence[i];
+            }
+
+            return word;
+        }
+};
+
+FiniteContextModel fcmodel(K); // Create a finite-context model with order K
 
 ///////////////////////////////////////////////////////
 
@@ -97,12 +156,7 @@ float calculate_bits(float prob)
 int apply_cpm(string filename, int k, float t, float a) {
 
     alpha = a; K = k; threshold = t; file_name = filename;
-    fcmodel.set_order(K);
     reset_cpm();
-
-    cout << "[cpm.cpp]: alpha = " << alpha << endl;
-    cout << "[cpm.cpp]: threshold = " << threshold << endl;
-    //cout << "[cpm.cpp]: K = " << K << endl;
 
     word = read_char(K);
     cout << "[cpm.cpp]: word = " << word << endl;
@@ -128,7 +182,7 @@ int apply_cpm(string filename, int k, float t, float a) {
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
-            //cout << "[cpm.cpp]: word = " << word << endl;
+            cout << "[cpm.cpp]: word = " << word << endl;
             total_characters++;
             actual_index++;
         }
@@ -142,6 +196,7 @@ int apply_cpm(string filename, int k, float t, float a) {
 
     return int(bits);
 }
+
 
 void predict() {
     
@@ -313,6 +368,7 @@ void predict() {
     actual_index = lowest_index;
     bits += lowest_bits;
 
+    cout << "avg bits: " << bits_to_write << endl;
 }
 
 
@@ -349,41 +405,50 @@ bool contains(list<string> list, string element)
 // Function to read and return "k" chars from the file every time it is called
 string read_char(int k)
 {
+
     static string c;
-
-
     if (file.eof())
     {
         cout << "[cpm.cpp]: ending file " << file_name << endl;
-        file.close();
+        end_of_file = true;
         return "";
     }
-
     if (!file.is_open())
     {
         cout << "[cpm.cpp]: opening file " << file_name << endl;
-        file.open(file_name, ios::binary);
-
+        file.open(file_name);
         char buffer[k];
         file.read(buffer, k);
-        c = string(buffer, file.gcount());
-        bits += log2(4) * k;
+        c = string(buffer, k);
+        bits += log2( N_different_symbols ) * k;
+        // cout << "[cpm.cpp]: c = " << c << endl;
+
+        // save on char_average_bits the position of the word and the bits to write
+        for (int i = 0; i < k; i++)
+        {
+            bits_map.insert(pair<int, pair<char,float>>(bits_map.size(),{buffer[i], alpha  / (alpha * N_different_symbols)}));
+        }
+
     }
+    // else bring the pointer k-1 positions back and read k chars
     else
     {
+        // bring the pointer k-1 positions back
         file.seekg(-k + 1, ios::cur);
         char buffer[k];
         file.read(buffer, k);
-        c = string(buffer, file.gcount());
+        c = string(buffer, k);
     }
-
+    // check if the file has less than k chars
     if (file.gcount() < k)
     {
         c = c.substr(0, file.gcount());
+        return "";
     }
-
+    // if it is the end of the file, close the file
     if (file.eof())
     {
+        end_of_file = true;
         file.close();
         return "";
     }
@@ -397,8 +462,6 @@ string read_char(int k)
             N_different_symbols++;
         }
     }
-
-
 
     return c;
 }
@@ -456,58 +519,77 @@ void reset_cpm() {
     lowest_index = 0;
     actual_index = 0;
     end_of_file = false;
-
 }
 
 
 
-// ///////////////////// Finite Context Model Class ///////////////////// //
+// //////////////////////// FCM FUCNTIONS ////////////////////////777
 
-class FiniteContextModel {
-    private:
-        unordered_map<string, unordered_map<char, int>> symbolCounts;
-        unordered_map<string, int> KWordCounts;
-        int order;
 
-    public:
-        FiniteContextModel(int order) : order(order) {}
+void train_fcm(string filename, int k, float t, float a) {
 
-        void train(const vector<char>& sequence) {
-            for (long unsigned int i = order; i < sequence.size(); i++) {
-                string kword = get_k_word(sequence, i);
-                char next_symbol = sequence[i];
-                
-                symbolCounts[kword][next_symbol]++;
-                KWordCounts[kword]++;
-            }
-        }
+    alpha = a; K = k; threshold = t; file_name = filename;
+    fcmodel.set_order(K);
+    
+    vector<char> sequence = read_file(file_name);
 
-        double get_probability(const vector<char>& sequence, char symbol) {
-            string kword = get_k_word(sequence, sequence.size());
-            int KWordCount = KWordCounts[kword];
-            int symbolCount = symbolCounts[kword][symbol];
-            
-            if (KWordCount == 0) return 0.0;
-            return static_cast<double>(symbolCount) / KWordCount;
-        }
+    fcmodel.train(sequence);
+    cout << "fcmodel train complete!" << endl;
+    
+}
 
-        void set_order(int order) {
-            order = order;
+float apply_fcm(string targetfile){
+    file_name = targetfile;
+    float bits = 0;
+    int index = K;
 
-            // reset the structures
-            symbolCounts = unordered_map<string, unordered_map<char, int>>;
-            KWordCounts  = unordered_map<string, int>;
-        }
+    bits_map = map<int,pair<char,float>>();
+    
+    word = read_char(K);
+    cout << "[fcm]: word = " << word << endl;
 
-    private:
-        string get_k_word(const vector<char>& sequence, int currentIndex) {
-            string word = "";
-            int startIndex = currentIndex - order;
-            
-            for (int i = startIndex; i < currentIndex; i++) {
-                word += sequence[i];
-            }
+    while (word != "") {
+        // pass string to vector<char>& sequence
+        vector<char> word_sequence(word.begin(), word.end());
+        
+        char next_symbol = read_char(K)[K-1];
+        bring_back(1);
+        
+        float prob = fcmodel.get_probability(word_sequence, next_symbol);
+        float num_bits = calculate_bits(prob);
 
-            return word;
-        }
-};
+        bits_map.insert(pair<int, pair<char,float>>(index, {next_symbol, num_bits}));
+
+        bits += num_bits;
+        cout << "[fcm]: prob = " << prob << endl;
+        
+        word = read_char(K);
+        cout << "[fcm]: word = " << word << endl;
+
+        index++;
+    }
+
+    // reset structures
+    file = ifstream();
+    
+    return bits;
+}
+
+vector<char> read_file(string filename) {
+
+    ifstream file(filename);  // Replace "filename.txt" with your file path
+    
+    if (!file) {
+        cerr << "Failed to open the file." << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    // Read the file content into a vector<char>
+    vector<char> fileContent((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+    
+    return fileContent;
+}
+
+map<int,pair<char,float>> get_char_bits() {
+    return bits_map;
+}
