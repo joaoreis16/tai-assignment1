@@ -22,3 +22,9 @@ g++ -std=c++11 -Wall findlang.cpp lang.cpp cpm.cpp -o findlang
 
 ./findlang lang_files portuguese.txt
 ```
+
+3. locatelang.cpp
+
+```bash
+
+```
