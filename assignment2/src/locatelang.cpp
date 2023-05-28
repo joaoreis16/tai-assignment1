@@ -53,6 +53,14 @@ int main(int argc, char* argv[]) {
                 return 1;
         }
     }
+    //check if file exist
+    ifstream file_exist(target_text);
+    if (!file_exist.good()) {
+        // File does not exist
+        cout << "[ERROR]: file '" << target_text << "' does not exist." << endl;
+        exit(0);
+    }
+    
 
     // get the file names and save them 
     DIR* directory = opendir(ri_folder);
