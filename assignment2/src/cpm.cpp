@@ -97,9 +97,9 @@ float calculate_bits(float prob) {
 }
 
 int apply_cpm(string filename, int k, float t, float a) {
-
-    alpha = a; K = k; threshold = t; file_name = filename;
     reset_cpm();
+    alpha = a; K = k; threshold = t; file_name = filename;
+    
 
     word = read_char(K);
     // cout << "[cpm.cpp]: word = " << word << endl;
@@ -452,9 +452,18 @@ void reset_cpm() {
 
 
 // //////////////////////// FCM FUCNTIONS ///////////////////////////
+void reset_fcm() {
+    fcmodel = FiniteContextModel(K);
+    file = ifstream();
+    bits_map.clear();
+    word = "";
+    // reset structures
+    file = ifstream();
 
+}
 
 void train_fcm(string filename, int k, float t, float a) {
+    reset_fcm();
 
     alpha = a; K = k; threshold = t; file_name = filename;
     fcmodel.set_order(K);
@@ -465,6 +474,7 @@ void train_fcm(string filename, int k, float t, float a) {
     cout << "fcmodel train complete!" << endl;
     
 }
+
 
 float apply_fcm(string targetfile){
     file_name = targetfile;
@@ -499,8 +509,7 @@ float apply_fcm(string targetfile){
         index++;
     }
 
-    // reset structures
-    file = ifstream();
+    
     
     return bits;
 }

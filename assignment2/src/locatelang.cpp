@@ -90,9 +90,11 @@ int main(int argc, char* argv[]) {
             train_fcm(file_path, K, threshold, alpha);
 
             estimated_bits = apply_fcm(target_text);
+            cout << "Model FCM for file " << filename << " done." << endl;
 
         } else {
             estimated_bits = get_estimated_bits(target_text, file_path, K, threshold, alpha);
+            cout << "Model CPM for file " << filename << " done." << endl;
         }
         
         // get un_map with symbols and their bits
@@ -107,10 +109,10 @@ int main(int argc, char* argv[]) {
         int N_diff_symbols = get_N_different_symbols();
         file_sizes[filename] = N_diff_symbols;
         
-        cout << "bits_map antes" << endl;
+
         //print bits_map
         for (auto it = bits_map.begin(); it != bits_map.end(); it++) {
-            cout << "index: " << it->first << " char: " << it->second.first << " bits: " << it->second.second << endl;
+            //cout << "index: " << it->first << " char: " << it->second.first << " bits: " << it->second.second << endl;
             if (first==1) {
                 index_char[it->first] = it->second.first;
                 if (it->first == bits_map.size() - 1) {
@@ -139,19 +141,19 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        cout << "suavizado" << endl;
-        //print bits_map
+
+        /* //print bits_map
         for (auto it = bits_map.begin(); it != bits_map.end(); it++) {
             cout << "index: " << it->first << " char: " << it->second.first << " bits: " << it->second.second << endl;
-        }
+        } */
        
 
         // save the result
         results[filename] = bits_map;
-        /*
-        if (filename == "Portuguese.txt") {
+        
+/*         if (filename == "English.utf8") {
             return 0;
-        }*/
+        } */
 
     }
     //static map<int, char> index_char = get_char_map();
@@ -195,8 +197,9 @@ int main(int argc, char* argv[]) {
             float min_value = 100000;
             int threshold = 0;
             for (auto it = results.begin(); it != results.end(); it++) {
-                
+
                 threshold = log2(file_sizes[it->first]);
+
                 
                 float value = 0;
                 for (int j = first_index; j < i; j++) {
@@ -208,7 +211,7 @@ int main(int argc, char* argv[]) {
                 }
             }
             if (language != new_language && new_language != "") {
-                cout << "language: " << language << endl;
+                //cout << "language: " << language << endl;
                 
                 if (language != ""){
                     language = new_language;
@@ -225,10 +228,10 @@ int main(int argc, char* argv[]) {
 
     }
 
-    //print index_lang
+/*     //print index_lang
     for (auto it = index_lang.begin(); it != index_lang.end(); it++) {
         cout << "Index: " << it->first << " Language: " << it->second << endl;
-    }
+    } */
 
     // update the index_lang map to mantain only languages that are longer than K*2
 
@@ -252,9 +255,9 @@ int main(int argc, char* argv[]) {
                     
                     auto it2 = it;
                     it2--;
-                    cout << "erasing " << it2->first << " " << it2->second << endl;
+                    //cout << "erasing " << it2->first << " " << it2->second << endl;
                     index_lang.erase(it2);
-                    cout << "erased" << endl;
+                    //cout << "erased" << endl;
                 }
                 else {
                     last_language = it->second;
