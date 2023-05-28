@@ -34,8 +34,6 @@ void print_unordered_map();
 
 void predict();
 
-void print_char_average_bits();
-
 map<int,pair<char,float>> get_char_bits();
 
 int apply_cpm(string filename, int k, float t, float a);
