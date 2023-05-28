@@ -195,9 +195,9 @@ int main(int argc, char* argv[]) {
             float min_value = 100000;
             int threshold = 0;
             for (auto it = results.begin(); it != results.end(); it++) {
-                if (threshold == 0) {
-                    threshold = log2(file_sizes[it->first]);
-                }
+                
+                threshold = log2(file_sizes[it->first]);
+                
                 float value = 0;
                 for (int j = first_index; j < i; j++) {
                     value += it->second[j].second;

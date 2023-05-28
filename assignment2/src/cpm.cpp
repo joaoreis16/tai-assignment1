@@ -107,9 +107,6 @@ class FiniteContextModel {
             int KWordCount = KWordCounts[kword];
             int symbolCount = symbolCounts[kword][next_symbol];
 
-            cout << "KWordCount = " << KWordCount << endl;
-            cout << "symbolCount = " << symbolCount << endl;
-
             return static_cast<double>((symbolCount) + alpha ) / (KWordCount + alpha * N_different_symbols);
         }
 
@@ -182,7 +179,6 @@ int apply_cpm(string filename, int k, float t, float a) {
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
-            cout << "[cpm.cpp]: word = " << word << endl;
             total_characters++;
             actual_index++;
         }
@@ -367,8 +363,6 @@ void predict() {
     }
     actual_index = lowest_index;
     bits += lowest_bits;
-
-    cout << "avg bits: " << bits_to_write << endl;
 }
 
 
