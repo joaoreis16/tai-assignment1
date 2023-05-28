@@ -79,7 +79,7 @@ float calculate_bits_lang(float prob)
  /* int main(int argc, char* argv[]) {
 
     if (argc < 3) {
-        cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
+        cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> -f)" << endl;
         return 1;
     }
 
@@ -119,7 +119,7 @@ float calculate_bits_lang(float prob)
                 fcmodel_flag = true;
                 break;
             default:
-                std::cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << std::endl;
+                std::cerr << "Usage: ./lang <ri_file> <analysis_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> -f)" << std::endl;
                 return 1;
         }
     }
@@ -149,7 +149,7 @@ float get_estimated_bits(string target_filename, string filename, int k, float t
 
     // apply the copy model
     float num_bits = apply_cpm(ri_filename, K, threshold, alpha);
-    cout << "[lang.cpp]: total bits = " << num_bits << endl;
+    // cout << "[lang.cpp]: total bits = " << num_bits << endl;
 
     // get un_map from cpm.cpp
     model = get_un_map();
@@ -159,8 +159,7 @@ float get_estimated_bits(string target_filename, string filename, int k, float t
 
     // get different symbols from cpm.cpp
     N_different_symbols = get_N_different_symbols();
-    cout << "[lang.cpp]: N_different_symbols = " << N_different_symbols << endl;
-
+    // cout << "[lang.cpp]: N_different_symbols = " << N_different_symbols << endl;
 
     // estimate bits for the target file
     float bits = estimate_bits(target_filename, model, vector_model);
@@ -349,7 +348,7 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
         word = read_word(K);
         //cout << "[lang.cpp]: word = " << word << endl;
     }
-    cout << "[lang.cpp]: bits = " << bits << endl;
+    // cout << "[lang.cpp]: bits = " << bits << endl;
     return bits;
 }
 
@@ -360,14 +359,14 @@ string read_word(int k)
 
     if (target_file.eof())
     {
-        cout << "[lang.cpp]: end of file" << endl;
+        // cout << "[lang.cpp]: end of file" << endl;
         end_of_file_target = true;
         return "";
     }
 
     if (!target_file.is_open())
     {
-        cout << "[lang.cpp]: opening file" << endl;
+        // cout << "[lang.cpp]: opening file" << endl;
         target_file.open(text_filename, ios::binary);
 
         char buffer[k];
@@ -424,7 +423,7 @@ string read_word(int k)
 
     if (target_file.eof())
     {
-        cout << "[lang.cpp]: end of file" << endl;
+        // cout << "[lang.cpp]: end of file" << endl;
         end_of_file_target = true;
         target_file.close();
         return "";

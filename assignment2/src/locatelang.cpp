@@ -25,7 +25,7 @@ map<int, string> index_lang;
 int main(int argc, char* argv[]) {
 
     if (argc < 3) {
-        cerr << "Usage: ./locatelang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
+        cerr << "Usage: ./locatelang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> -f)" << endl;
         return 1;
     }
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
                 fcmodel_flag = true;
                 break;
             default:
-                cerr << "Usage: ./locatelang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
+                cerr << "Usage: ./locatelang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> -f)" << endl;
                 return 1;
         }
     }

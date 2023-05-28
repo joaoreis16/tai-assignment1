@@ -21,7 +21,7 @@ static bool fcmodel_flag = false;
 int main(int argc, char* argv[]) {
 
     if (argc < 3) {
-        cerr << "Usage: ./findlang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
+        cerr << "Usage: ./findlang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> -f)" << endl;
         return 1;
     }
 
@@ -45,9 +45,17 @@ int main(int argc, char* argv[]) {
                 fcmodel_flag = true;
                 break;
             default:
-                cerr << "Usage: ./findlang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> )" << endl;
+                cerr << "Usage: ./findlang <ri_foldername> <target_file> (optional: -a <alpha: int> -t <threshold: float> -k <K: int> -f)" << endl;
                 return 1;
         }
+    }
+
+    // to check if the file exist
+    ifstream file_exist(target_text);
+    if (!file_exist.good()) {
+        // File does not exist
+        cout << "[ERROR]: file '" << target_text << "' does not exist." << endl;
+        exit(0);
     }
 
     // get the file names and save them 
@@ -75,12 +83,12 @@ int main(int argc, char* argv[]) {
     float min_bits = 99999999999.0;
     for (const auto& filename : all_files) {
 
-        std::string folder;
+        string folder;
         folder.assign(ri_folder);
         string temp = folder + "/";
         string file_path = temp + filename;
 
-        cout << "\n\n>> file: " << filename << endl;  // Print the file name
+        cout << "\n>> file: " << filename << endl;  // Print the file name
 
         float bits;
         if (fcmodel_flag) {

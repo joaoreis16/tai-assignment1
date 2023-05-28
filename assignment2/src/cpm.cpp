@@ -13,6 +13,7 @@
 #include <map>
 
 #include "cpm.hpp"
+#include "fcm.hpp"
 
 using namespace std;
 
@@ -33,8 +34,6 @@ void print_unordered_map();
 void predict();
 
 void reset_cpm();
-
-void print_char_average_bits();
 
 int apply_cpm(string filename, int k, float t, float a);
 
@@ -81,59 +80,6 @@ static int N_different_symbols = 0;
 map<int,pair<char,float>> bits_map;
 
 
-// ///////////////////// Finite Context Model Class ///////////////////// //
-
-class FiniteContextModel {
-    private:
-        unordered_map<string, unordered_map<char, int>> symbolCounts;
-        unordered_map<string, int> KWordCounts;
-        int order;
-
-    public:
-        FiniteContextModel(int order) : order(order) {}
-
-        void train(const vector<char>& sequence) {
-            for (long unsigned int i = order; i < sequence.size(); i++) {
-                string kword = get_k_word(sequence, i);
-                char next_symbol = sequence[i];
-                
-                symbolCounts[kword][next_symbol]++;
-                KWordCounts[kword]++;
-            }
-        }
-
-        double get_probability(const vector<char>& sequence, char next_symbol) {
-            string kword = get_k_word(sequence, sequence.size());
-            int KWordCount = KWordCounts[kword];
-            int symbolCount = symbolCounts[kword][next_symbol];
-
-            cout << "KWordCount = " << KWordCount << endl;
-            cout << "symbolCount = " << symbolCount << endl;
-
-            return static_cast<double>((symbolCount) + alpha ) / (KWordCount + alpha * N_different_symbols);
-        }
-
-        void set_order(int order) {
-            order = order;
-
-            // reset the structures
-            symbolCounts = unordered_map<string, unordered_map<char, int>>();
-            KWordCounts  = unordered_map<string, int>();
-        }
-
-    private:
-        string get_k_word(const vector<char>& sequence, int currentIndex) {
-            string word = "";
-            int startIndex = currentIndex - order;
-            
-            for (int i = startIndex; i < currentIndex; i++) {
-                word += sequence[i];
-            }
-
-            return word;
-        }
-};
-
 FiniteContextModel fcmodel(K); // Create a finite-context model with order K
 
 ///////////////////////////////////////////////////////
@@ -142,14 +88,11 @@ int get_N_different_symbols() {
     return N_different_symbols;
 }
 
-float calculate_probability(string word, char next_char)
-{
-
+float calculate_probability(string word, char next_char) {
     return (float)(N_hits + alpha) / (N_hits + N_fails + 2 * alpha);
 }
 
-float calculate_bits(float prob)
-{
+float calculate_bits(float prob) {
     return (float)-log2(prob);
 }
 
@@ -159,7 +102,7 @@ int apply_cpm(string filename, int k, float t, float a) {
     reset_cpm();
 
     word = read_char(K);
-    cout << "[cpm.cpp]: word = " << word << endl;
+    // cout << "[cpm.cpp]: word = " << word << endl;
 
     do {
         if (word == "") break;
@@ -182,17 +125,16 @@ int apply_cpm(string filename, int k, float t, float a) {
             // add max bits to write 
             bits += log2(4); // 4 is the number of possible chars
             word = read_char(K);
-            cout << "[cpm.cpp]: word = " << word << endl;
+            // cout << "[cpm.cpp]: word = " << word << endl;
             total_characters++;
             actual_index++;
         }
 
     } while (!end_of_file);
 
-    cout << "[cpm.cpp]: total_bits = " << int(bits) << endl;
+    // cout << "[cpm.cpp]: total_bits = " << int(bits) << endl;
     float average_bits = bits / total_characters;
-    cout << "[cpm.cpp]: Average_number_of_bits = " << average_bits << endl;
-    print_char_average_bits();
+    // cout << "[cpm.cpp]: Average_number_of_bits = " << average_bits << endl;
 
     return int(bits);
 }
@@ -368,24 +310,23 @@ void predict() {
     actual_index = lowest_index;
     bits += lowest_bits;
 
-    cout << "avg bits: " << bits_to_write << endl;
+    // cout << "avg bits: " << bits_to_write << endl;
 }
 
 
 void print_words_read_list(list<string> words_read_list)
 {
-    cout << "words_read" << endl;
+    // cout << "words_read" << endl;
     int index = 0;
     for (auto it = words_read_list.begin(); it != words_read_list.end(); ++it)
     {
-        cout << index << " -> " << *it << '\n';
+        // cout << index << " -> " << *it << '\n';
         index++;
     }
 }
 
 void print_unordered_map()
 {
-    cout << "unorderer_map" << endl;
     for (auto it = un_map.begin(); it != un_map.end(); it++)
     {
         cout << it->first << " => ";
@@ -409,13 +350,13 @@ string read_char(int k)
     static string c;
     if (file.eof())
     {
-        cout << "[cpm.cpp]: ending file " << file_name << endl;
+        // cout << "[cpm.cpp]: ending file " << file_name << endl;
         end_of_file = true;
         return "";
     }
     if (!file.is_open())
     {
-        cout << "[cpm.cpp]: opening file " << file_name << endl;
+        // cout << "[cpm.cpp]: opening file " << file_name << endl;
         file.open(file_name);
         char buffer[k];
         file.read(buffer, k);
@@ -477,19 +418,6 @@ void bring_back(int k)
     file.seekg(-k, ios::cur);
 }
 
-void print_char_average_bits()
-{
-    //cout << "Average number of bits per character:" << endl;
-    /* for (const auto &entry : char_bits)
-    {
-        char character = entry.first;
-        float total_bits = entry.second;
-        int occurrences = char_occurrences[character];
-        float result = occurrences == 0 ? 0 : total_bits / occurrences;
-        //cout << character << ": " << result << endl;
-    } */
-}
-
 unordered_map<string, list<int> > get_un_map() {
     return un_map;
 }
@@ -523,7 +451,7 @@ void reset_cpm() {
 
 
 
-// //////////////////////// FCM FUCNTIONS ////////////////////////777
+// //////////////////////// FCM FUCNTIONS ///////////////////////////
 
 
 void train_fcm(string filename, int k, float t, float a) {
@@ -543,10 +471,12 @@ float apply_fcm(string targetfile){
     float bits = 0;
     int index = K;
 
+    cout << "fcmodel applied to the file " << targetfile << endl;
+
     bits_map = map<int,pair<char,float>>();
     
     word = read_char(K);
-    cout << "[fcm]: word = " << word << endl;
+    // cout << "[fcm]: word = " << word << endl;
 
     while (word != "") {
         // pass string to vector<char>& sequence
@@ -555,16 +485,16 @@ float apply_fcm(string targetfile){
         char next_symbol = read_char(K)[K-1];
         bring_back(1);
         
-        float prob = fcmodel.get_probability(word_sequence, next_symbol);
+        float prob = fcmodel.get_probability(word_sequence, next_symbol, alpha, N_different_symbols);
         float num_bits = calculate_bits(prob);
 
         bits_map.insert(pair<int, pair<char,float>>(index, {next_symbol, num_bits}));
 
         bits += num_bits;
-        cout << "[fcm]: prob = " << prob << endl;
+        // cout << "[fcm]: prob = " << prob << endl;
         
         word = read_char(K);
-        cout << "[fcm]: word = " << word << endl;
+        // cout << "[fcm]: word = " << word << endl;
 
         index++;
     }
