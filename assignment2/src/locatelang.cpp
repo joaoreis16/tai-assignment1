@@ -69,6 +69,9 @@ int main(int argc, char* argv[]) {
             }
         }
         closedir(directory);
+
+    } else {
+        cout << "Failed to open the folder '"<< ri_folder <<"'." << endl;
     }
 
     // create a map to save the results
