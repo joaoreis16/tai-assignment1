@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <vector>
 #include <map>
+#include <chrono>
 
 #include "cpm.hpp"
 #include "lang.hpp"
@@ -78,6 +79,7 @@ int main(int argc, char* argv[]) {
         cout << "Failed to open the folder '"<< ri_folder <<"'." << endl;
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
 
     string lang_found;
     float min_bits = 99999999999.0;
@@ -112,5 +114,31 @@ int main(int argc, char* argv[]) {
     string language  = lang_found.substr(0, extensionPos);
 
     cout << "\n\nthe language of the file '" << target_text << "' is " << language << " (bits = " << min_bits << ")" << endl;
+
+    size_t foundPos = target_text.find(language);
+
+    int result = 0;
+    if (foundPos != std::string::npos) {
+        cout << "it's correct!!!" << endl;
+        result = 1;
+
+    } else {
+        cout << "it's wrong :(" << endl;
+    }
+
+    auto end = chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    cout << "execution time = " << elapsed.count() << std::endl;
+
+    // Write results to a file
+    ofstream outputFile("results/findlang_results.txt", ios::app);
+    if (outputFile.is_open()) {
+        outputFile << "\n" << alpha << " " << threshold << " " << K << " " << result << " " << fcmodel_flag << " " << min_bits << " " << elapsed.count() << endl;
+        outputFile.close();
+
+    } else {
+        cout << "Failed to open the results file." << endl;
+    }
+
     return 0;
 }
