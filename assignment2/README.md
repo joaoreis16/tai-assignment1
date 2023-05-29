@@ -8,10 +8,10 @@
 g++ -std=c++11 -Wall lang.cpp cpm.cpp fcm.cpp -o lang
 
 # applying our copy model
-./lang english.txt portuguese.txt
+./lang lang_files/short/Portuguese.utf8 target_files/Dutch.utf8
 
 # applying the finite-context model
-./lang english.txt portuguese.txt -f
+./lang lang_files/short/Portuguese.utf8 target_files/Dutch.utf8 -f
 ```
 
 2. findlang.cpp
@@ -20,10 +20,10 @@ g++ -std=c++11 -Wall lang.cpp cpm.cpp fcm.cpp -o lang
 g++ -std=c++11 -Wall findlang.cpp lang.cpp cpm.cpp fcm.cpp -o findlang
 
 # applying our copy model
-./findlang lang_files/short portuguese.txt
+./findlang lang_files/short target_files/Dutch.utf8
 
 # applying the finite-context model
-./findlang lang_files/short portuguese.txt -f
+./findlang lang_files/short target_files/Dutch.utf8 -f
 ```
 
 3. locatelang.cpp
@@ -32,9 +32,9 @@ g++ -std=c++11 -Wall findlang.cpp lang.cpp cpm.cpp fcm.cpp -o findlang
 g++ -std=c++11 -Wall locatelang.cpp lang.cpp cpm.cpp fcm.cpp -o locatelang
 
 # applying our copy model
-./locatelang lang_files/short portuguese.txt
+./locatelang lang_files/short target_files/Dutch.utf8
 
 # applying the finite-context model
-./locatelang lang_files/short portuguese.txt -f
+./locatelang lang_files/short target_files/Dutch.utf8 -f
 ```
 
