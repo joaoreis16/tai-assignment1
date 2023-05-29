@@ -328,16 +328,12 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
         }
         // if the word is not in the model
         else {
-            //cout << "[lang.cpp]: word not in model" << endl;
-            //cout << "[lang.cpp]: N_different_symbols = " << N_different_symbols << endl;
             if (first_time!=0){
                 float bits_symbol = log2(N_different_symbols);
                 //cout << "[lang.cpp]: bits_symbol = " << bits_symbol << endl;
                 bits += bits_symbol;                    
                 // save on char_average_bits the position of the word and the bits to write
                 char_average_bits.insert(pair<int, pair<char,float>>(position, {word[word.size()-1], bits_symbol}));
-                //cout << "[lang.cpp]: index = " << char_average_bits.size() << endl;
-                //cout << "[lang.cpp]: bits = " << bits_symbol << endl;
             }
             else{
                 first_time=1;
@@ -346,9 +342,7 @@ float estimate_bits(string target_file_name, unordered_map<string, list<int>> mo
         }
         // read the next word
         word = read_word(K);
-        //cout << "[lang.cpp]: word = " << word << endl;
     }
-    // cout << "[lang.cpp]: bits = " << bits << endl;
     return bits;
 }
 
@@ -359,14 +353,12 @@ string read_word(int k)
 
     if (target_file.eof())
     {
-        // cout << "[lang.cpp]: end of file" << endl;
         end_of_file_target = true;
         return "";
     }
 
     if (!target_file.is_open())
     {
-        // cout << "[lang.cpp]: opening file" << endl;
         target_file.open(text_filename, ios::binary);
 
         char buffer[k];
@@ -397,8 +389,6 @@ string read_word(int k)
 
         if (c.size() < k)
         {
-            //cout << "[lang.cpp]: N_different_symbols = " << N_different_symbols << endl;
-
             float bits_symbol = log2(N_different_symbols);
             //cout << "[lang.cpp]: bits_symbol = " << bits_symbol << endl;
             bits += bits_symbol;

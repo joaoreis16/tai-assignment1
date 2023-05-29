@@ -131,13 +131,9 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        //return 0;
-
 
         // suavizar o map
-        // fazer media de 3 em 3
-        
-        
+        // fazer media de 3 em 3 
         for (auto it = bits_map.begin(); it != bits_map.end(); it++) {
 
             //cout << "index: " << it->first << " char: " << it->second.first << " bits: " << it->second.second << endl;
@@ -151,44 +147,17 @@ int main(int argc, char* argv[]) {
                 it->second.second = average;
             }
         }
-
-
-        /* //print bits_map
-        for (auto it = bits_map.begin(); it != bits_map.end(); it++) {
-            cout << "index: " << it->first << " char: " << it->second.first << " bits: " << it->second.second << endl;
-        } */
        
-
         // save the result
         results[filename] = bits_map;
         
-/*         if (filename == "English.utf8") {
-            return 0;
-        } */
 
     }
-    //static map<int, char> index_char = get_char_map();
-    /*
-    //print index_char
-    for (auto it = index_char.begin(); it != index_char.end(); it++) {
-        cout << it->first << " " << it->second << endl;
-    }*/
 
-
-/*
-    // print the results
-    for (auto it = results.begin(); it != results.end(); it++) {
-        cout << it->first << ": ";
-        for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-            cout << it2->first << " " << it2->second << " ";
-        }
-        cout << endl;
-    }
-*/
     //check where a language begins and ends
-    //for each index in the target text get the lowest value of all the maps
-    //if the lowest value is the same for all the maps, then the language is the same
-    //if the lowest value is different, then the language is different
+    //get every word and for each word get the language based on the bits of each symbol and the threshold
+    //if the language changes, save the index and the language
+    //if the language is the same, keep going
     int target_file_size = get_target_file_size(target_text);
     cout << "target_file_size: " << target_file_size << endl;
     string language = "";
@@ -202,7 +171,6 @@ int main(int argc, char* argv[]) {
         }
         word += index_char[i];
         if ((isalpha(index_char[i])==0 && isdigit(index_char[i])==0 && word.size() >1)|| i == target_file_size ) {
-            //cout << "word: " << word << endl;
             float lowest_value = 100000;
             string new_language = "";
             float min_value = 100000;
@@ -211,7 +179,6 @@ int main(int argc, char* argv[]) {
 
                 threshold = log2(file_sizes[it->first]);
 
-                
                 float value = 0;
                 for (int j = first_index; j < i; j++) {
                     value += it->second[j].second;
@@ -221,9 +188,7 @@ int main(int argc, char* argv[]) {
                     new_language = it->first;
                 }
             }
-            if (language != new_language && new_language != "") {
-                //cout << "language: " << language << endl;
-                
+            if (language != new_language && new_language != "") { 
                 if (language != ""){
                     language = new_language;
                     index_lang[i] = language;
@@ -239,13 +204,7 @@ int main(int argc, char* argv[]) {
 
     }
 
-/*     //print index_lang
-    for (auto it = index_lang.begin(); it != index_lang.end(); it++) {
-        cout << "Index: " << it->first << " Language: " << it->second << endl;
-    } */
-
     // update the index_lang map to mantain only languages that are longer than K*2
-
     int last_index = 0;
     string last_language = "";
     for (auto it = index_lang.begin(); it != index_lang.end(); it++) {
@@ -266,9 +225,7 @@ int main(int argc, char* argv[]) {
                     
                     auto it2 = it;
                     it2--;
-                    //cout << "erasing " << it2->first << " " << it2->second << endl;
                     index_lang.erase(it2);
-                    //cout << "erased" << endl;
                 }
                 else {
                     last_language = it->second;
