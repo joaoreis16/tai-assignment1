@@ -34,9 +34,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 for i in range(len(alpha)):
     if result[i] == 1:
-        ax.scatter(alpha[i], k[i], bits[i], c='green', marker='o')
+        ax.scatter(alpha[i], k[i], bits[i], c='green', marker='o', label='result = 1')
     else:
-        ax.scatter(alpha[i], k[i], bits[i], c='red', marker='o')
+        ax.scatter(alpha[i], k[i], bits[i], c='red', marker='o', label='result = 0')
 
 ax.set_xlabel('Alpha')
 ax.set_ylabel('k')
@@ -49,9 +49,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 for i in range(len(alpha)):
     if result[i] == 1:
-        ax.scatter(alpha[i], k[i], time[i], c='green', marker='o')
+        ax.scatter(alpha[i], k[i], time[i], c='green', marker='o', label='result = 1')
     else:
-        ax.scatter(alpha[i], k[i], time[i], c='red', marker='o')
+        ax.scatter(alpha[i], k[i], time[i], c='red', marker='o', label='result = 0')
 
 ax.set_xlabel('Alpha')
 ax.set_ylabel('k')
@@ -65,9 +65,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 for i in range(len(alpha)):
     if result[i] == 1:
-        ax.scatter(alpha[i], threshold[i], bits[i], c='green', marker='o')
+        ax.scatter(alpha[i], threshold[i], bits[i], c='green', marker='o', label='result = 1')
     else:
-        ax.scatter(alpha[i], threshold[i], bits[i], c='red', marker='o')
+        ax.scatter(alpha[i], threshold[i], bits[i], c='red', marker='o', label='result = 0')
 
 ax.set_xlabel('Alpha')
 ax.set_ylabel('Threshold')
@@ -81,9 +81,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 for i in range(len(alpha)):
     if result[i] == 1:
-        ax.scatter(alpha[i], threshold[i], time[i], c='green', marker='o')
+        ax.scatter(alpha[i], threshold[i], time[i], c='green', marker='o',  label='result = 1')
     else:
-        ax.scatter(alpha[i], threshold[i], time[i], c='red', marker='o')
+        ax.scatter(alpha[i], threshold[i], time[i], c='red', marker='o', label='result = 0')
 
 ax.set_xlabel('Alpha')
 ax.set_ylabel('Threshold')
@@ -96,9 +96,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 for i in range(len(alpha)):
     if result[i] == 1:
-        ax.scatter(bits[i], fcmodel[i], k[i], c='green', marker='o')
+        ax.scatter(bits[i], fcmodel[i], k[i], c='green', marker='o', label='result = 1')
     else:
-        ax.scatter(bits[i], fcmodel[i], k[i], c='red', marker='o')
+        ax.scatter(bits[i], fcmodel[i], k[i], c='red', marker='o', label='result = 0')
 
 ax.set_xlabel('Bits')
 ax.set_ylabel('fcmodel')
@@ -106,7 +106,6 @@ ax.set_zlabel('k')
 ax.set_title('Bits vs FC Model vs k')
 plt.show()
 
-"""
 
 # Initialize lists to store execution times
 execution_times_1 = []
